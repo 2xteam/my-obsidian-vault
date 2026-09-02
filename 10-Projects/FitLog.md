@@ -21,6 +21,16 @@ updated: 2026-09-02
 Next.js 15 · MongoDB(`fit` DB) · OpenAI Vision · Cloudflare R2(`fitlog` 버킷) · Vercel `icn1`
 로컬 개발 포트 **3003** (SnapWord 3000 · SnapNote 3001 · myjane 3002).
 
+## 디자인
+
+**결쩜사 패턴을 따른다** — SnapWord·SnapNote의 검정+민트 계열이 아니다.
+
+- 라이트 기본 `#fdfbff` / `#7c3aed`, 다크 `#190527` / `#a78bfa`
+- Pretendard, 중립색에 보라를 섞어 순수 검정·회색을 쓰지 않음
+- 화면은 `.sheet`(plain / tint / dark / gold) 단위로 쌓고, 시트마다 eyebrow → headline → 콘텐츠
+- `components/Sheet.tsx`가 시트와 실(結) 장식을 담당
+→ [[결쩜사 페이지 패턴]] · [[레퍼런스 사이트 분석 방법]]
+
 ## 데이터 모델
 
 | 컬렉션 | 내용 |
@@ -70,9 +80,11 @@ Next.js 15 · MongoDB(`fit` DB) · OpenAI Vision · Cloudflare R2(`fitlog` 버�
 - [x] 데이터 모델 · 필드 카탈로그 · 정합성 검증
 - [x] Vision 추출 파이프라인 · `/api/measurements` `/api/measurements/extract`
 - [x] 도메인 연결 (`fitlog.myjane.co.kr`)
-- [ ] 프로필 입력 화면 + 게이트 UI
-- [ ] 업로드 → 검토·수정 → 저장 화면
-- [ ] 측정 목록 · 상세 (표준범위 막대 · etc 목록 · 원본 사진)
+- [x] 결쩜사 팔레트·서체·시트 구조 적용
+- [x] 프로필 화면(`/my`) + 게이트 (프로필 없으면 추출이 428로 거부)
+- [x] 업로드 → 검토·수정 → 저장 (`/measurements/new`)
+- [x] 측정 목록(직전 대비 증감) · 상세(표준범위 막대 · etc · 원본)
+- [x] 통합 로그인 연결 (운영 도메인에서 포털로 리디렉트)
 - [ ] 체중 기록 · 추이 그래프 · BMI 계산기
 - [ ] AI Fit 상담사 (최근 측정값 컨텍스트 주입)
 - [ ] 활동·운동 기록 (2차)
