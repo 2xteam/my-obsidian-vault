@@ -52,6 +52,9 @@ Next.js 15 (App Router) · React 19 · TypeScript · MongoDB Atlas · OpenAI · 
   → [[앱 공통 UI와 아이콘]]
 - 푸터의 `MyJane` 평문 링크를 워드마크 `my`+`jane`으로 교체.
   `jane`은 브랜드 보라 고정 — 이 앱의 액센트(민트)를 쓰면 초록색이 된다
+- 네온핑크 테마를 FitLog와 같은 **보라 팔레트로 교체하고 기본 테마로** 삼음
+  (`data-theme="violet"` 재사용, 검정+민트 다크는 선택지로 유지)
+- `dbName`을 코드에서 명시 — URI 경로에 의존하지 않는다 → [[MongoDB Atlas]]
 - 상단 네비를 주 기능(`Home` `Folders` `Print`)만 남기고
   부가 기능(`My` `Notice` `Q&A` `Logout`)은 `More ▾`로 접었다.
   모바일 햄버거 메뉴에서는 구분선 아래로 내려간다

@@ -20,6 +20,11 @@ updated: 2026-09-02
 
 Next.js 15 · MongoDB(`fit` DB) · OpenAI Vision · Cloudflare R2(`fitlog` 버킷) · Vercel `icn1`
 로컬 개발 포트 **3003** (SnapWord 3000 · SnapNote 3001 · myjane 3002).
+`npm run dev` / HTTPS가 필요하면 `npm run dev:https` → [[인증과 세션 공유]]
+
+DB 이름은 URI 경로가 아니라 **코드에서 `dbName: "fit"`으로 못 박는다.**
+운영 URI가 `math`를 가리켜 측정 기록이 SnapNote DB에 쌓인 사고가 있었다
+→ [[MongoDB Atlas]]
 
 ## 디자인
 

@@ -16,12 +16,22 @@ SnapWord · SnapNote · FitLog · 포털이 **기술적으로** 공유하는 시
 
 | 테마 | SnapWord · SnapNote | FitLog |
 |---|---|---|
-| 다크(기본) | `#000000` / `#2ee8ae` | `#190527` / `#a78bfa` |
+| **퍼플** | **기본** `#190527` / `#a78bfa` | 기본(`dark`) `#190527` / `#a78bfa` |
+| 다크 | `#000000` / `#2ee8ae` | — |
 | 화이트 | `#f2f2f7` / `#1ab485` | `#fdfbff` / `#7c3aed` |
-| 네온핑크 | `#050008` / `#ff4ecd` | `#050008` / `#ff4ecd` |
+| 네온핑크 | 폐지 (2026-09-02) | `#050008` / `#ff4ecd` |
 | 커스텀 | 사용자 지정 | 사용자 지정 |
 
-FitLog만 [[결쩜사 디자인 시스템]] 팔레트(보라)를 쓴다. 두 Snap 앱은 검정+민트다.
+2026-09-02에 두 Snap 앱의 네온핑크를 **FitLog와 같은 보라 팔레트로 교체하고
+기본 테마로 삼았다.** `data-theme` 값은 `violet`을 그대로 재사용해서
+기존 선택이 살아남는다. 검정+민트 다크 테마는 선택지로 남겼다.
+
+기본 테마를 바꿀 때 함께 고쳐야 하는 곳 —
+
+- `app/globals.css`의 `:root` (첫 페인트가 기본 테마와 같아야 한다)
+- `lib/theme.ts`의 `DEFAULT_THEME`
+- `components/ThemeProvider.tsx`의 초기 상태·컨텍스트 기본값
+- `app/manifest.ts`의 `background_color` · `theme_color`
 
 **포털(www.myjane.co.kr)은 라이트 전용**이다. 테마 전환이 없고 결쩜사 팔레트
 (`#fdfbff` / `#7c3aed` / 골드 `#c9a84c`)를 쓴다. 참고 사이트가 라이트 전용이라
@@ -51,6 +61,10 @@ FitLog만 [[결쩜사 디자인 시스템]] 팔레트(보라)를 쓴다. 두 Sna
 - **SiteFooter** — 서비스 한 줄 설명 + myjane 워드마크 + `@2026 MyJane All rights reserved`
   (**좌측 정렬**)
 - **Toast** — 상단 알림
+
+접힌(모바일) 메뉴의 `Logout`은 위 링크들과 **같은 줄 높이·정렬**로 맞춘다.
+`.topnav-logout`(작은 알약 버튼)을 그대로 쓰면 글씨가 작고 안쪽으로 들여써져 튄다.
+`.topnav-menu-link .topnav-menu-logout` 조합으로 두고 밑줄만 없앤다.
 
 ## myjane 워드마크
 

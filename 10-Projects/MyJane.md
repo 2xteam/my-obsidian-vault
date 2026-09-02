@@ -49,7 +49,11 @@ myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 | STUDY(white) | 공부 기록 — SnapWord · SnapNote 2단 카드 |
 | HEALTH(tint) | 건강 기록 — FitLog 단독 카드(`.apps--solo`, 620px 중앙) |
 | ABOUT(white) | "묶어둔 건 계정뿐이에요" 4개 항목 |
-| START(white) | 회원가입 CTA |
+| START(white) | 회원가입 CTA — **로그인 상태에서는 감춤** |
+
+로그인 상태에 따라 갈리는 조각(`components/LandingAuth.tsx`) —
+우측 상단은 `로그아웃`만, 회원가입 버튼·히어로 버튼·마지막 CTA 시트는 감춘다
+→ [[인증과 세션 공유]]
 
 ## 통합 로그인
 
