@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/snapnote
 local: C:\Dev\SnapNote
 branch: master
 db: math
-tags: [project, myjane-family]
+tags: [project, myjane]
 updated: 2026-09-02
 ---
 
@@ -42,3 +42,13 @@ SnapWord와 동일 (Next.js 15 · MongoDB · OpenAI · Vercel `icn1`).
 - [x] Vercel 이관 · 도메인 · DB · 메일(PIN 찾기) 정상
 - [x] 하단 공통 푸터
 - [ ] `NEXT_PUBLIC_COOKIE_DOMAIN` Config 재등록
+
+## 2026-09-02 변경
+
+- 앱 아이콘을 **게이지 호 스타일**로 교체 (`public/app-icon.svg`가 원본)
+  → [[앱 공통 UI와 아이콘]]
+- 푸터의 `MyJane` 평문 링크를 워드마크 `my`+`jane`으로 교체.
+  `jane`은 브랜드 보라 고정 — 이 앱의 액센트(민트)를 쓰면 초록색이 된다
+- 상단 네비를 주 기능(`Home` `Folders` `Print`)만 남기고
+  부가 기능(`My` `Notice` `Q&A` `Logout`)은 `More ▾`로 접었다.
+  모바일 햄버거 메뉴에서는 구분선 아래로 내려간다

@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/fitlog
 local: C:\Dev\fitlog
 branch: main
 db: fit
-tags: [project, myjane-family]
+tags: [project, myjane]
 updated: 2026-09-02
 ---
 
@@ -29,17 +29,23 @@ Next.js 15 · MongoDB(`fit` DB) · OpenAI Vision · Cloudflare R2(`fitlog` 버�
 - Pretendard, 중립색에 보라를 섞어 순수 검정·회색을 쓰지 않음
 - 화면은 `.sheet`(plain / tint / dark / gold) 단위로 쌓고, 시트마다 eyebrow → headline → 콘텐츠
 - `components/Sheet.tsx`가 시트와 실(結) 장식을 담당
+- 상단 메뉴 표기는 영어 — `Home` `Inbody` `History`. 부가 기능(My · Notice · Q&A ·
+  Logout)은 `More ▾`로 접는다 → [[앱 공통 UI와 아이콘]]
 → [[결쩜사 페이지 패턴]] · [[레퍼런스 사이트 분석 방법]]
 
 ## 데이터 모델
 
 | 컬렉션 | 내용 |
 |---|---|
-| `measurements` | 인바디 측정 1건 — 아래 참조 |
-| `weights` | 체중 기록 (체중계는 매일, 인바디는 몇 달에 한 번이라 분리) |
+| `measurements` | 인바디 측정 1건 — 아래 참조. **체중만 넣은 기록도 여기 들어간다** |
 | `activities` | 운동·활동 기록 (예정) |
 | `chatthreads` | AI Fit 상담사 |
-| `user` DB `users` | 세 앱 공용 + `heightCm` `gender` `birthYear` (FitLog 전용 필드) |
+| `user` DB `users` | 앱 공용 + `heightCm` `gender` `birthYear` (FitLog 전용 필드) |
+
+> `weights` 컬렉션과 `/weight` 화면은 **2026-09-02에 없앴다.** 체중을 따로 관리하니
+> 같은 지표가 두 곳에 생겨 추이가 갈렸다. 지금은 결과지 없이 체중만 입력해도
+> `source: "manual"` 인바디 기록 1건으로 저장된다. 상단 탭에서도 빼고
+> 등록 화면(`/measurements/new`) 안의 "체중만 기록" 시트로 옮겼다.
 
 ### measurements 설계 원칙
 
@@ -85,8 +91,14 @@ Next.js 15 · MongoDB(`fit` DB) · OpenAI Vision · Cloudflare R2(`fitlog` 버�
 - [x] 업로드 → 검토·수정 → 저장 (`/measurements/new`)
 - [x] 측정 목록(직전 대비 증감) · 상세(표준범위 막대 · etc · 원본)
 - [x] 통합 로그인 연결 (운영 도메인에서 포털로 리디렉트)
-- [ ] 체중 기록 · 추이 그래프 · BMI 계산기
+- [x] 결과지 **여러 장 동시 업로드** (순차 추출 → 장마다 검토 → 저장)
+- [x] 체중만 기록 (별도 컬렉션 없이 인바디 기록으로)
+- [x] History — 항목별 접기/펼치기 + 좌우 스크롤 추이 그래프
+- [x] 핵심 3종 **삼각 레이더** (적정 범위 음영 + 내 위치) → [[SVG 차트 패턴]]
+- [ ] BMI 계산기
 - [ ] AI Fit 상담사 (최근 측정값 컨텍스트 주입)
+- [ ] 운영 환경 변수 보강 — `R2_*` 5개 · `OPENAI_VISION_MODEL` · `SMTP_*`
+- [ ] 실제 결과지 7장으로 추출 정확도 검증 · 프롬프트 튜닝
 - [ ] 활동·운동 기록 (2차)
 
 ## 테스트 자산

@@ -6,13 +6,17 @@ domain: www.myjane.co.kr
 repo: https://github.com/2xteam/myjane
 local: C:\Dev\myjane
 branch: main
-tags: [project, myjane-family]
+tags: [project, myjane]
 updated: 2026-09-02
 ---
 
 # MyJane
 
-앱 패밀리 포털. SnapWord · SnapNote · FitLog로 이동하는 링크 사이트.
+myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
+
+랜딩은 **카테고리별로 시트를 나눈다** — 공부 기록(SnapWord · SnapNote) /
+건강 기록(FitLog). 한 덩어리 제품처럼 소개하지 않는다
+→ [[서비스 카테고리와 카피 원칙]]
 
 ## 성격
 
@@ -24,23 +28,28 @@ updated: 2026-09-02
 
 ## 브랜딩
 
-색 체계는 **결쩜사 팔레트**를 따른다 (라이트 `#fdfbff`/`#7c3aed`, 다크 `#1e0938`/`#a78bfa`).
+**라이트 전용**이다. 결쩜사 팔레트를 따른다 — `#fdfbff` / `#7c3aed` / 골드 `#c9a84c`.
+참고 사이트가 라이트 전용이어서 다크를 얹으면 대조가 어긋난다.
 랜딩도 결쩜사처럼 **시트를 쌓는 구조**이며 어두운 푸터로 닫는다.
-MJ 아이콘(네이비+앰버)은 교체 예정이라 당분간 그대로 둔다.
+서체는 본문 Pretendard + 헤드라인 Gowun Batang 700.
 
-이전 팔레트 메모 —
-`public/myjane-icon.png`(512px)가 원본이고 나머지 크기는 여기서 파생한다.
+상단·푸터 워드마크는 `my`(본문색) + `jane`(보라). 푸터는 어두우니 `my`가 흰색이다
+→ [[앱 공통 UI와 아이콘]]
 
-| | 배경 | 강조 |
-|---|---|---|
-| 다크(기본) | `#0c2343` | `#f9c22a` |
-| 라이트 | `#f4f6fc` | `#f2951a` (텍스트용 `#a2620a`) |
+아이콘은 **사용자가 준 MJ 원본 이미지**를 쓴다. 원본은 `public/app-icon-source.jpg`,
+파생본이 `public/myjane-icon.png`(512px) 및 각 크기.
 
-앰버는 흰 배경에서 대비가 부족해 텍스트 강조에는 어둡게 조정한 `--accent-ink`를 쓴다.
+## 랜딩 구조
 
-## 앱 카드 추가하기
+`app/page.tsx` 한 파일이다. 카드를 고칠 때는 `STUDY_APPS` / `HEALTH_APPS` 배열을 만진다.
 
-`app/page.tsx`의 `APPS` 배열만 수정하면 된다.
+| 시트 | 내용 |
+|---|---|
+| 히어로(dark) | "필요한 기록만, 골라서 쌓아요" |
+| STUDY(white) | 공부 기록 — SnapWord · SnapNote 2단 카드 |
+| HEALTH(tint) | 건강 기록 — FitLog 단독 카드(`.apps--solo`, 620px 중앙) |
+| ABOUT(white) | "묶어둔 건 계정뿐이에요" 4개 항목 |
+| START(white) | 회원가입 CTA |
 
 ## 통합 로그인
 
@@ -64,4 +73,4 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 - [ ] 토큰 사용 로그(`token_logs`) — 어느 앱의 어느 기능에서 썼는지
 - [ ] 각 앱에 남은 회원가입·PIN 재설정 화면 정리
 - [ ] 세션 쿠키를 HttpOnly 서버 쿠키로 전환 검토 (현재는 클라이언트가 읽는 쿠키)
-- [ ] FitLog 카드 추가
+- [x] FitLog 카드 추가 · 카테고리 구조로 랜딩 재구성 (2026-09-02)

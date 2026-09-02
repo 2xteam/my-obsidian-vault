@@ -24,10 +24,10 @@ updated: 2026-09-02
 
 | 서비스 | 도메인 | 성격 |
 |---|---|---|
-| [[MyJane]] | `www.myjane.co.kr` | 앱 패밀리 포털 |
-| [[SnapWord]] | `snapword.myjane.co.kr` | 사진으로 단어장 만들기 |
-| [[SnapNote]] | `snapnote.myjane.co.kr` | 사진으로 오답노트 만들기 |
-| [[FitLog]] | `fitlog.myjane.co.kr` | 인바디 결과지 기록·추이 |
+| [[MyJane]] | `www.myjane.co.kr` | 포털 · 통합 로그인 |
+| [[SnapWord]] | `snapword.myjane.co.kr` | 공부 기록 — 사진으로 단어장 만들기 |
+| [[SnapNote]] | `snapnote.myjane.co.kr` | 공부 기록 — 사진으로 오답노트 만들기 |
+| [[FitLog]] | `fitlog.myjane.co.kr` | 건강 기록 — 인바디 결과지 기록·추이 |
 | [[Ignite]] | `www.ignitearch.co.kr` | 건축사무소 웹사이트 |
 | [[결쩜사]] | `kyulzzumsa.co.kr` | 매칭 서비스 (디자인 참고 대상) |
 
@@ -37,3 +37,4 @@ updated: 2026-09-02
 - AI에게 작업을 맡긴다면 → [[AI 협업 규칙]]
 - 결쩜사와 같은 결의 페이지를 만들려면 → [[결쩜사 디자인 시스템]] · [[결쩜사 페이지 패턴]]
 - 새로운 참고 사이트를 분석한다면 → [[레퍼런스 사이트 분석 방법]]
+- 서비스를 소개하는 문장을 쓴다면 → [[서비스 카테고리와 카피 원칙]]

@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/snapword
 local: C:\Dev\SnapWord
 branch: main
 db: vocab
-tags: [project, myjane-family]
+tags: [project, myjane]
 updated: 2026-09-02
 ---
 
@@ -18,7 +18,7 @@ updated: 2026-09-02
 ## 스택
 
 Next.js 15 (App Router) · React 19 · TypeScript · MongoDB Atlas · OpenAI · Vercel(`icn1`)
-서체·테마는 CSS 변수 기반 다크/라이트/네온핑크/커스텀 4종 ([[MyJane 앱 패밀리 디자인]]).
+서체·테마는 CSS 변수 기반 다크/라이트/네온핑크/커스텀 4종 ([[앱 공통 UI와 아이콘]]).
 
 ## 데이터
 
@@ -45,3 +45,13 @@ Next.js 15 (App Router) · React 19 · TypeScript · MongoDB Atlas · OpenAI · 
 - [x] Vercel 이관 · 도메인 연결 · DB·메일 정상
 - [x] 하단 공통 푸터 (MyJane 링크)
 - [ ] `NEXT_PUBLIC_COOKIE_DOMAIN`을 **Config 타입**으로 재등록 → 세션 공유 활성화
+
+## 2026-09-02 변경
+
+- 앱 아이콘을 **게이지 호 스타일**로 교체 (`public/app-icon.svg`가 원본)
+  → [[앱 공통 UI와 아이콘]]
+- 푸터의 `MyJane` 평문 링크를 워드마크 `my`+`jane`으로 교체.
+  `jane`은 브랜드 보라 고정 — 이 앱의 액센트(민트)를 쓰면 초록색이 된다
+- 상단 네비를 주 기능(`Home` `Folders` `Print`)만 남기고
+  부가 기능(`My` `Notice` `Q&A` `Logout`)은 `More ▾`로 접었다.
+  모바일 햄버거 메뉴에서는 구분선 아래로 내려간다
