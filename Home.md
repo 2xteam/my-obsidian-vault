@@ -1,0 +1,38 @@
+---
+title: Home
+type: moc
+tags: [moc]
+updated: 2026-09-02
+---
+
+# Home
+
+2xteam이 운영하는 서비스들의 지식 저장소. 볼트의 모든 문서는 여기서 출발한다.
+
+## 지도
+
+| 폴더 | 무엇이 있나 |
+|---|---|
+| [[Projects MOC]] | 앱·사이트별 정보 (스택 · 도메인 · 데이터 · 현황) |
+| [[Design MOC]] | 디자인 시스템과 페이지 패턴 |
+| [[Patterns MOC]] | 반복해서 쓰는 개발 패턴과 함정 |
+| [[Infra MOC]] | 도메인 · DB · 스토리지 · 배포 |
+| `00-Meta` | 볼트 사용 규칙, AI 협업 규칙 |
+| `Templates` | 새 노트를 만들 때 쓰는 틀 |
+
+## 운영 중인 서비스
+
+| 서비스 | 도메인 | 성격 |
+|---|---|---|
+| [[MyJane]] | `www.myjane.co.kr` | 앱 패밀리 포털 |
+| [[SnapWord]] | `snapword.myjane.co.kr` | 사진으로 단어장 만들기 |
+| [[SnapNote]] | `snapnote.myjane.co.kr` | 사진으로 오답노트 만들기 |
+| [[FitLog]] | `fitlog.myjane.co.kr` | 인바디 결과지 기록·추이 |
+| [[Ignite]] | `www.ignitearch.co.kr` | 건축사무소 웹사이트 |
+| [[결쩜사]] | `kyulzzumsa.co.kr` | 매칭 서비스 (디자인 참고 대상) |
+
+## 시작하기
+
+- 볼트를 처음 연다면 → [[옵시디언 사용 규칙]]
+- AI에게 작업을 맡긴다면 → [[AI 협업 규칙]]
+- 결쩜사와 같은 결의 페이지를 만들려면 → [[결쩜사 디자인 시스템]] · [[결쩜사 페이지 패턴]]

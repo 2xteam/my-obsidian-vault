@@ -1,0 +1,13 @@
+---
+title: Patterns MOC
+type: moc
+tags: [moc]
+updated: 2026-09-02
+---
+
+# Patterns MOC
+
+- [[Vercel 배포 패턴]] — 프로젝트 생성부터 도메인까지, 환경 변수 함정 3개
+- [[이미지 업로드 패턴]] — 4.5MB 제한을 목적지별로 다르게 푸는 법
+- [[인증과 세션 공유]] — 공용 `user` DB와 쿠키 도메인
+- [[OpenAI Vision 추출 패턴]] — 사진에서 구조화 데이터 뽑기

@@ -1,0 +1,7 @@
+# Obsidian 개인 설정 — 작업공간·플러그인 상태는 사람마다 다르다
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/
+
+.DS_Store
