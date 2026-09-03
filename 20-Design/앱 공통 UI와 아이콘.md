@@ -57,7 +57,11 @@ SnapWord · SnapNote · FitLog · 포털이 **기술적으로** 공유하는 시
 - **TopNav** — 로고 + 앱 스위처(다른 앱 아이콘) + 메뉴 + 테마 선택
   주기능이 아닌 항목(My · Notice · Q&A)은 PC에서 `More ▾` 드롭다운,
   모바일에서는 구분선 아래로 내린다. 상단 메뉴 표기는 영어(`Home` `Inbody` `History`)
-- **FloatingChat** — 우하단 AI 상담 버튼
+- **FloatingChat** — 우하단 AI 상담 버튼.
+  FitLog는 **근육을 불끈 쥐는 팔**이다(회전 없음). 힘을 줬다 폈다 하는 동안
+  이두만 부풀고, 그 순간 링과 스파크가 한 번 퍼진다.
+  대화가 비어 있으면 소개와 **질문 예시 칩**을 대화처럼 먼저 보여준다 —
+  빈 화면은 무엇을 물어봐야 할지 모르게 만든다
 - **SiteFooter** — 서비스 한 줄 설명 + myjane 워드마크 + `@2026 MyJane All rights reserved`
   (**좌측 정렬**)
 - **Toast** — 상단 알림
