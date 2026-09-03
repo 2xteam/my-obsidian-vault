@@ -160,8 +160,21 @@ upsert라 날짜를 바꾸면 다른 날 기록을 덮어쓴다. 그래서 이 �
 그 순간 링과 스파크가 한 번 퍼진다(`fab-arm` · `fab-bicep` · `fab-burst` · `fab-spark`).
 대화가 없을 때는 상담사 소개와 **질문 예시 칩**을 대화처럼 먼저 보여준다.
 
-> ⚠️ **아직 백엔드가 없다.** `/api/chat/threads` 등이 FitLog에 없어 질문을 보내면
-> "지금은 상담사와 연결할 수 없어요"가 뜬다. 화면만 준비된 상태다.
+2026-09-02에 백엔드를 붙였다(SnapWord와 같은 Conversations API 방식).
+
+| 조각 | 역할 |
+|---|---|
+| `/api/chat/threads` | 대화방 목록·생성 |
+| `/api/chat/threads/[threadId]/messages` | 이력 조회·전송 (`maxDuration = 60`) |
+| `lib/chatOpenAi.ts` | 시스템 지침 + 턴 실행 + 제목 생성 |
+| `lib/chatRagDocuments.ts` | 체지방·골격근·체수분·기초대사량·측정조건·앱사용법 청크 |
+| `lib/measurementContext.ts` | **최근 3건의 실제 수치**를 매 턴 지침에 싣는다 |
+
+- 대화 본문은 OpenAI Conversations에만 있고, DB에는 스레드와 누적 토큰만 남는다
+- 정책·RAG·내 기록은 **매 턴 `instructions`에만** 넣는다.
+  대화 아이템에는 질문만 남아, 기록이 바뀌면 다음 턴부터 최신값이 반영된다
+- 진단·처방·극단적 감량은 거절하고, 이상 신호는 진료를 권한다
+- 기록에 없는 값은 지어내지 않고 "기록에 없다"고 말하게 한다
 
 ## 테스트 자산
 
