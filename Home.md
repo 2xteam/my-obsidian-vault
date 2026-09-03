@@ -2,7 +2,7 @@
 title: Home
 type: moc
 tags: [moc]
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # Home
@@ -28,6 +28,7 @@ updated: 2026-09-02
 | [[SnapWord]] | `snapword.myjane.co.kr` | 공부 기록 — 사진으로 단어장 만들기 |
 | [[SnapNote]] | `snapnote.myjane.co.kr` | 공부 기록 — 사진으로 오답노트 만들기 |
 | [[FitLog]] | `fitlog.myjane.co.kr` | 건강 기록 — 인바디 결과지 기록·추이 |
+| [[2hbk]] | `2hbk.myjane.co.kr` | 습관 기록 — 목표에 스티커 모아 채우기 |
 | [[Ignite]] | `www.ignitearch.co.kr` | 건축사무소 웹사이트 |
 | [[결쩜사]] | `kyulzzumsa.co.kr` | 매칭 서비스 (디자인 참고 대상) |
 

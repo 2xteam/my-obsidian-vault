@@ -2,7 +2,7 @@
 title: Projects MOC
 type: moc
 tags: [moc]
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # Projects MOC
@@ -22,6 +22,11 @@ updated: 2026-09-02
 **건강 기록**
 
 - [[FitLog]] — 인바디 기록 · `fit` · **개발 중**
+
+**습관 기록**
+
+- [[2hbk]] — 목표·스티커 · `hamhibokka` · **이관 완료, 배포 대기**
+  네 앱 중 유일하게 **이메일 + 비밀번호** 로그인이다
 
 ## 별개 서비스
 

@@ -70,3 +70,21 @@ node -e "..."   # 셋 다 AccessDenied 면 토큰 문제다
 Secret 64자 hex). 형식이 맞는데 403이면 값이 잘린 게 아니라 **권한 문제**다.
 
 2026-09-02 FitLog 로컬이 이 경우였다 — 값 형식은 정상인데 세 호출 모두 403.
+같은 키로 `snapnote-uploads`는 HeadBucket·PutObject 모두 성공하고 `fitlog`만 403이었다.
+**토큰이 SnapNote 버킷 범위로만 발급돼 있었다.** 계정·키는 멀쩡했다.
+
+버킷을 새로 만들면 토큰도 그 버킷을 포함하도록 다시 발급해야 한다.
+기존 앱의 `.env`를 복사해 쓰면 계정·키가 맞아 보여서 원인을 찾기 어렵다.
+
+### R2_PUBLIC_URL 도 버킷마다 다르다
+
+`pub-<해시>.r2.dev` 의 해시는 **버킷별**이다. 다른 앱의 값을 복사하면
+업로드는 성공하는데 화면에서만 안 열린다. R2 → 버킷 → Settings →
+Public Development URL 에서 그 버킷의 주소를 가져온다.
+(2026-09-02 FitLog `.env.local` 이 SnapNote 의 공개 주소를 쓰고 있었다)
+
+### `npm run r2:check`
+
+FitLog에 점검 스크립트를 뒀다(`scripts/check-r2.mjs`).
+HeadBucket → PutObject → 공개 URL GET → DELETE 를 실제로 해보고
+막힌 지점과 고칠 것을 출력한다. 다른 앱에도 그대로 복사해 쓸 수 있다.
