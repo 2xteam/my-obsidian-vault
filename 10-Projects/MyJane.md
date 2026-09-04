@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/myjane
 local: C:\Dev\myjane
 branch: main
 tags: [project, myjane]
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # MyJane
@@ -15,7 +15,7 @@ updated: 2026-09-02
 myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 
 랜딩은 **카테고리별로 시트를 나눈다** — 공부 기록(SnapWord · SnapNote) /
-건강 기록(FitLog). 한 덩어리 제품처럼 소개하지 않는다
+건강 기록(FitLog) / 습관 기록([[2hbk]]). 한 덩어리 제품처럼 소개하지 않는다
 → [[서비스 카테고리와 카피 원칙]]
 
 ## 성격
@@ -24,7 +24,11 @@ myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 랜딩(`/`)은 여전히 정적이고, 인증 라우트만 서버에서 돈다.
 
 필요한 환경 변수: `MONGO_URI` `MONGO_USER_DB` `NEXT_PUBLIC_COOKIE_DOMAIN`
-`NEXT_PUBLIC_BASE_URL` `SMTP_*` — `NEXT_PUBLIC_*` 은 **Config 타입**이어야 한다.
+`NEXT_PUBLIC_BASE_URL` `SMTP_*` `SESSION_SECRET` `ADMIN_API_SECRET` — `NEXT_PUBLIC_*` 은
+**Config 타입**이어야 한다.
+
+`SESSION_SECRET`은 세션 서명 키다. **2hbk 배포와 같은 값**이어야 한다
+→ [[인증과 세션 공유]]
 
 ## 브랜딩
 
@@ -41,14 +45,16 @@ myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 
 ## 랜딩 구조
 
-`app/page.tsx` 한 파일이다. 카드를 고칠 때는 `STUDY_APPS` / `HEALTH_APPS` 배열을 만진다.
+`app/page.tsx` 한 파일이다. 카드를 고칠 때는 `STUDY_APPS` / `HEALTH_APPS` /
+`HABIT_APPS` 배열을 만진다.
 
 | 시트 | 내용 |
 |---|---|
 | 히어로(dark) | "필요한 기록만, 골라서 쌓아요" |
 | STUDY(white) | 공부 기록 — SnapWord · SnapNote 2단 카드 |
 | HEALTH(tint) | 건강 기록 — FitLog 단독 카드(`.apps--solo`, 620px 중앙) |
-| ABOUT(white) | "묶어둔 건 계정뿐이에요" 4개 항목 |
+| HABIT(white) | 습관 기록 — 2hbk 단독 카드 |
+| ABOUT(tint) | "묶어둔 건 계정뿐이에요" 4개 항목 |
 | START(white) | 회원가입 CTA — **로그인 상태에서는 감춤** |
 
 로그인 상태에 따라 갈리는 조각(`components/LandingAuth.tsx`) —
@@ -57,7 +63,7 @@ myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 
 ## 통합 로그인
 
-세 앱의 로그인·회원가입을 여기로 모았다.
+네 앱의 로그인·회원가입을 여기로 모았다.
 
 ```
 snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
@@ -65,6 +71,10 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 ```
 
 - `lib/apps.ts` — 앱 목록과 복귀 URL 생성. `next`는 **경로만** 허용해 오픈 리다이렉트를 막는다
+- **입력칸은 하나다.** 이메일이든 전화번호든, 비밀번호든 PIN이든 받는다
+  (`lib/identifier.ts`). 2hbk 전용이던 이메일 화면은 이 화면이 대신한다
+- `requiresSessionToken` 인 앱(2hbk)은 세션에 서명 토큰이 없으면 되돌려보내지 않는다
+- `particle`은 이름 뒤 조사 — `2hbk`는 "케이"로 끝나 `으로`가 아니라 `로`다
 - `users.signupFrom` 에 가입 출처를 기록
 - `from=fitlog` 이면 회원가입에서 신체 프로필(키·성별·출생연도)을 함께 받는다
 - 각 앱은 운영 도메인일 때만 포털로 보낸다. 로컬 개발에서는 자기 로그인 화면을 쓴다
@@ -73,8 +83,9 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 
 ## 예정 작업
 
-- [ ] **통합 admin** — 앱별 탭으로 회원·토큰·문의·공지·통계 관리
+- [x] **통합 admin** (2026-09-04) — 앱별 탭. 회원·공지·문의·요약 → [[통합 admin]]
 - [ ] 토큰 사용 로그(`token_logs`) — 어느 앱의 어느 기능에서 썼는지
 - [ ] 각 앱에 남은 회원가입·PIN 재설정 화면 정리
+- [x] 2hbk 이메일 로그인 경로 · 세션 서명 토큰 (2026-09-03) → [[2hbk]]
 - [ ] 세션 쿠키를 HttpOnly 서버 쿠키로 전환 검토 (현재는 클라이언트가 읽는 쿠키)
 - [x] FitLog 카드 추가 · 카테고리 구조로 랜딩 재구성 (2026-09-02)

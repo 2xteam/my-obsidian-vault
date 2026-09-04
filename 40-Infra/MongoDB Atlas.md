@@ -2,7 +2,7 @@
 title: MongoDB Atlas
 type: infra
 tags: [infra, mongodb]
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # MongoDB Atlas
@@ -47,6 +47,10 @@ mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB, ... });
 | SnapWord | `vocab` |
 | SnapNote | `math` |
 | FitLog | `fit` |
+| 2hbk | `hamhibokka` |
+
+통합 admin 도 이 클러스터를 쓰지만 **앱 DB 를 직접 읽지는 않는다.**
+회원(`user`)만 직접 읽고 나머지는 각 앱의 API 를 거친다 → [[통합 admin]]
 
 `MONGO_DB` 환경 변수로 덮어쓸 수 있게 두되, 평소에는 설정하지 않는다.
 

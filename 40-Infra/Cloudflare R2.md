@@ -2,7 +2,7 @@
 title: Cloudflare R2
 type: infra
 tags: [infra, r2, storage]
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # Cloudflare R2
@@ -17,6 +17,7 @@ updated: 2026-09-02
 | `fitlog` | FitLog 인바디 결과지 원본 |
 | `ignite` | Ignite 프로젝트 이미지 |
 | `templete` | klead 등 공유 버킷 (앱별 프리픽스로 분리) |
+| `2hbk` | 2hbk 프로필·목표 이미지 |
 
 계정이 서비스별로 다를 수 있으니 `R2_ACCOUNT_ID`를 확인한다.
 

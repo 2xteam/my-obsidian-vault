@@ -2,12 +2,12 @@
 title: Vercel 배포 패턴
 type: pattern
 tags: [pattern, vercel, infra]
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # Vercel 배포 패턴
 
-SnapWord · SnapNote · myjane · FitLog를 옮기며 실제로 겪은 것만 적는다.
+SnapWord · SnapNote · myjane · FitLog · 2hbk를 옮기며 실제로 겪은 것만 적는다.
 새 프로젝트를 올릴 때 이 문서를 먼저 본다.
 
 ## 프로젝트 생성
@@ -15,13 +15,35 @@ SnapWord · SnapNote · myjane · FitLog를 옮기며 실제로 겪은 것만 �
 1. Add New → Project → 저장소 Import
 2. **Node.js Version 22.x** — 20 미만에서는 `File` 글로벌이 없어 이미지 업로드가 502
 3. **Production Branch 확인** — SnapNote는 `master`다. 기본값(main)을 그대로 두면 배포가 안 된다
-4. `vercel.json`에 리전 고정
+4. **Framework Preset이 `Next.js`인지 확인** — 아래 함정 참고
+5. `vercel.json`에 리전과 프레임워크를 고정
 
 ```json
-{ "regions": ["icn1"] }
+{ "regions": ["icn1"], "framework": "nextjs" }
 ```
 
 사용자·Atlas가 모두 한국이라 서울 리전이 체감 성능을 좌우한다. Hobby 플랜에서도 적용된다.
+
+### ⚠️ Framework Preset이 `Other`로 잡히면 조용히 404
+
+2026-09-03 2hbk에서 겪었다. **빌드는 성공(`● Ready`)하는데 `/`가 404**다.
+커스텀 도메인은 물론 `<프로젝트>.vercel.app`까지 404라 도메인 문제로 착각한다.
+
+원인은 Output Directory다. `Other` 프리셋은
+
+```
+Build Command      npm run build          ← 잘 돈다
+Output Directory   `public` if it exists  ← 정적 사이트로 취급한다
+```
+
+`public/`에 `index.html`이 없으니 내보낼 게 없고, **Next.js 서버·함수가 아예
+연결되지 않는다.** 에러도 경고도 없다.
+
+확인 — `npx vercel project inspect <프로젝트>`의 Framework Settings를 본다.
+
+대응 — **`vercel.json`에 `"framework": "nextjs"`를 적는다.** 이 값이 대시보드
+설정을 덮으므로 저장소에 두면 다시 어긋날 일이 없다. 대시보드에서만 고치면
+프로젝트를 다시 만들 때 똑같이 밟는다.
 
 ## 환경 변수 — 함정 3개
 

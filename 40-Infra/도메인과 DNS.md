@@ -2,7 +2,7 @@
 title: 도메인과 DNS
 type: infra
 tags: [infra, dns, gabia]
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # 도메인과 DNS
@@ -18,6 +18,7 @@ updated: 2026-09-02
 | `snapword` | CNAME | Vercel |
 | `snapnote` | CNAME | Vercel |
 | `fitlog` | CNAME | Vercel |
+| `2hbk` | CNAME | Vercel |
 
 MX·TXT 레코드 없음 → 도메인 메일 미사용. DNS를 바꿔도 메일 영향이 없다.
 TTL은 600으로 유지 — 문제 시 10분 내 롤백.
@@ -44,3 +45,4 @@ MX 없음. Vercel 이관 시 두 레코드를 함께 바꾼다 → [[Ignite]]
 - 2026-09-01 SnapWord · SnapNote: Cloudways(`165.22.247.25`) → Vercel
 - 2026-09-02 myjane apex·www: Cloudways → Vercel, **Cloudways 서버 완전 삭제**
 - 2026-09-02 fitlog 신규 연결
+- 2026-09-03 `2hbk` 신규 연결 → [[2hbk]]
