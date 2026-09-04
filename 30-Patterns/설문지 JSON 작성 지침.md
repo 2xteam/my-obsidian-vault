@@ -223,7 +223,7 @@ updated: 2026-09-04
 | `strategy` | 추가 필드 | 설명 |
 |---|---|---|
 | `argmax` | `tiebreak` ✅ | 가장 높은 `tally`의 `id`가 결과 코드 |
-| `letters` | `order` ✅ · `threshold` · `tiebreak` ✅ | 축마다 `pomp`가 임계값(기본 50) 미만이면 `left.code`, 이상이면 `right.code`. `order` 순서로 이어 붙인 문자열이 코드 |
+| `letters` | `order` ✅ · `threshold` | 축마다 `pomp`가 임계값(기본 50) 미만이면 `left.code`, 이상이면 `right.code`. `order` 순서로 이어 붙인 문자열이 코드. **`tiebreak` 는 쓰지 않는다** — 축마다 독립으로 갈라 결과가 하나로 정해진다 |
 | `nearest` | `metric` (`cosine`·`euclidean`) | 응답 벡터와 `resultTypes[].vector`의 최근접 |
 | `band` | `on` ✅ · `bands` ✅ | `{ "on": "total", "bands": [ {"lt":34,"code":"low"}, {"lt":67,"code":"mid"}, {"code":"high"} ] }` |
 | `matrix` | `rows` ✅ · `cols` ✅ · `cells` ✅ | 두 축을 구간으로 나눈 조합표 |
@@ -245,6 +245,11 @@ updated: 2026-09-04
 `gte` · `lte` · `in`. **마지막 규칙은 반드시 `"when": true`** 로 기본값을 둔다.
 
 `outcome` 값은 언제나 **POMP 0~100**으로 비교한다. 원점수가 아니다.
+
+> **`letters` 에서는 축마다 문항을 홀수 개로 둔다.** 짝수면 원점수가 정확히 0 이 되는
+> 응답이 생기고, 그때 POMP 가 딱 50 이라 임계값 쪽(오른쪽 letter)으로 기계적으로
+> 떨어진다. 홀수면 그 경우가 아예 없다 — 예: 축마다 3문항에 ±2 를 주면 원점수가
+> −6 · −2 · +2 · +6 만 나온다.
 
 ## `resultTypes` — 준비된 답안
 
