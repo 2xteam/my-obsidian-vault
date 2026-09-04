@@ -77,6 +77,35 @@ mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB, ... });
 **`MONGO_DB` 환경 변수는 두지 않는다.** 있으면 언젠가 다른 앱 값이 복사돼 들어온다.
 `.env.example` 에도 적지 않는다 — 적어두면 채우게 된다.
 
+### 스키마에 필드를 더했는데 저장되지 않으면 — 모델 캐시
+
+> ⚠️ **2026-09-04.** `quizzes` 스키마에 `disclaimer` 를 더하고 등록했는데 필드가
+> 아예 생기지 않았다. 오류도 경고도 없었고 화면에만 아무것도 안 떴다.
+>
+> mongoose 는 컴파일한 모델을 `mongoose.models` 에 담아 두는데 이 객체는
+> `globalThis` 에 있어서 **Next 의 HMR 을 넘어 살아남는다.** 그래서 스키마를
+> 고쳐도 옛 모델이 계속 쓰이고, `strict` 가 모르는 경로를 `$set` 에서
+> **조용히 버린다.** 개발 서버를 재시작하기 전까지 계속 그렇다.
+>
+> 대응 — 모델을 가져오는 자리를 한 곳으로 모으고, **개발 중 스키마 객체가
+> 바뀌었을 때만** 다시 컴파일한다. HMR 로 모듈이 다시 실행되면 스키마는 새
+> 객체가 되므로 동일성 비교로 알 수 있다. 매 요청마다 지우고 만들지 않는다.
+>
+> ```ts
+> // lib/model.ts
+> const existing = mongoose.models[name];
+> if (existing && process.env.NODE_ENV !== "production" && existing.schema !== schema) {
+>   mongoose.deleteModel(name);
+> }
+> return mongoose.models[name] ?? mongoose.model(name, schema, collection);
+> ```
+>
+> `useDb()` 로 얻은 다른 연결의 모델은 `mongoose.models` 가 아니라 그 연결에
+> 달려 있어 따로 처리한다(`defineModelOn`).
+>
+> **증상을 기억할 것: 새 필드가 없는데 아무도 알려주지 않는다.** 스키마를 고친
+> 뒤에는 등록해 보고 **DB 를 직접 확인**한다.
+
 ## 새 앱의 DB 를 만들 때
 
 **앱별 DB 는 Atlas 에서 미리 만든다.** 기술적으로는 mongoose 가 첫 쓰기에 자동으로
