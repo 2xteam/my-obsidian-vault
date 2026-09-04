@@ -2,7 +2,7 @@
 title: Home
 type: moc
 tags: [moc]
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # Home
@@ -22,15 +22,20 @@ updated: 2026-09-03
 
 ## 운영 중인 서비스
 
-| 서비스 | 도메인 | 성격 |
-|---|---|---|
-| [[MyJane]] | `www.myjane.co.kr` | 포털 · 통합 로그인 |
-| [[SnapWord]] | `snapword.myjane.co.kr` | 공부 기록 — 사진으로 단어장 만들기 |
-| [[SnapNote]] | `snapnote.myjane.co.kr` | 공부 기록 — 사진으로 오답노트 만들기 |
-| [[FitLog]] | `fitlog.myjane.co.kr` | 건강 기록 — 인바디 결과지 기록·추이 |
-| [[2hbk]] | `2hbk.myjane.co.kr` | 습관 기록 — 목표에 스티커 모아 채우기 |
-| [[Ignite]] | `www.ignitearch.co.kr` | 건축사무소 웹사이트 |
-| [[결쩜사]] | `kyulzzumsa.co.kr` | 매칭 서비스 (디자인 참고 대상) |
+| 서비스 | 도메인 | 로컬 포트 | 성격 |
+|---|---|---|---|
+| [[MyJane]] | `www.myjane.co.kr` | **3000** | 포털 · 통합 로그인 · admin |
+| [[SnapWord]] | `snapword.myjane.co.kr` | **3001** | 공부 기록 — 사진으로 단어장 만들기 |
+| [[SnapNote]] | `snapnote.myjane.co.kr` | **3002** | 공부 기록 — 사진으로 오답노트 만들기 |
+| [[FitLog]] | `fitlog.myjane.co.kr` | **3003** | 건강 기록 — 인바디 결과지 기록·추이 |
+| [[2hbk]] | `2hbk.myjane.co.kr` | **3004** | 습관 기록 — 목표에 스티커 모아 채우기 |
+| [[TypeLog]] | `typelog.myjane.co.kr` | **3005** | 성향 기록 — 타입 놀이 (준비 중) |
+| [[Ignite]] | `www.ignitearch.co.kr` | — | 건축사무소 웹사이트 |
+| [[결쩜사]] | `kyulzzumsa.co.kr` | — | 매칭 서비스 (디자인 참고 대상) |
+
+**로컬 개발 포트는 이 표가 유일한 기준이다.** 2026-09-04에 포털을 3000으로 옮기면서
+`myjane 3002 · SnapWord 3000 · SnapNote 3001`에서 위와 같이 바꿨다.
+포트 번호를 프로젝트 노트마다 나열하면 어긋나므로 **각 노트는 자기 번호만** 적는다.
 
 ## 시작하기
 

@@ -2,7 +2,7 @@
 title: Cloudflare R2
 type: infra
 tags: [infra, r2, storage]
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # Cloudflare R2
@@ -28,13 +28,21 @@ updated: 2026-09-03
 
 ```json
 [{
-  "AllowedOrigins": ["http://localhost:3000", "https://<운영도메인>"],
+  "AllowedOrigins": ["http://localhost:<그 앱의 로컬 포트>", "https://<운영도메인>"],
   "AllowedMethods": ["PUT", "GET", "HEAD"],
   "AllowedHeaders": ["*"],
   "ExposeHeaders": ["ETag"],
   "MaxAgeSeconds": 3600
 }]
 ```
+
+포트는 앱마다 다르다 → [[Home]]의 표.
+
+> **2026-09-04 확인: 모든 버킷의 CORS 정책이 비어 있다.** 네 앱 모두 브라우저에서 R2로
+> 직접 PUT하지 않고 서버를 거치기 때문이다 → [[이미지 업로드 패턴]]
+> 그래서 같은 날 세 앱의 포트를 바꿀 때(myjane 3000 · SnapWord 3001 · SnapNote 3002)
+> **R2 쪽에 고칠 것이 없었다.** 나중에 사전 서명 직접 업로드를 도입하는 앱이 생기면
+> 그 앱의 포트로 CORS를 새로 넣어야 한다.
 
 **토큰 권한 주의**: 오브젝트 읽기/쓰기 전용 토큰으로는 CORS를 설정할 수 없다(`AccessDenied`).
 Admin Read & Write 토큰을 쓰거나 Cloudflare 대시보드에서 직접 넣는다.

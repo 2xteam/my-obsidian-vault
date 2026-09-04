@@ -8,7 +8,7 @@ local: C:\Dev\fitlog
 branch: main
 db: fit
 tags: [project, myjane]
-updated: 2026-09-02
+updated: 2026-09-04
 ---
 
 # FitLog
@@ -19,7 +19,7 @@ updated: 2026-09-02
 ## 스택
 
 Next.js 15 · MongoDB(`fit` DB) · OpenAI Vision · Cloudflare R2(`fitlog` 버킷) · Vercel `icn1`
-로컬 개발 포트 **3003** (SnapWord 3000 · SnapNote 3001 · myjane 3002).
+로컬 개발 포트 **3003** (전체 표는 [[Home]]).
 `npm run dev` / HTTPS가 필요하면 `npm run dev:https` → [[인증과 세션 공유]]
 
 DB 이름은 URI 경로가 아니라 **코드에서 `dbName: "fit"`으로 못 박는다.**

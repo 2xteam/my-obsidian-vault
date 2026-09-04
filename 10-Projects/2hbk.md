@@ -8,7 +8,7 @@ local: C:\Dev\2hbk
 branch: main
 db: hamhibokka
 tags: [project, myjane]
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # 2hbk
@@ -38,7 +38,7 @@ Next.js 15 단독 프로젝트로 옮겼다. **옛 Azure 리소스는 둘 다 �
 ## 스택
 
 Next.js 15 App Router · MongoDB(`hamhibokka` DB) · Cloudflare R2 · Vercel `icn1`
-로컬 개발 포트 **3004** (SnapWord 3000 · SnapNote 3001 · myjane 3002 · FitLog 3003).
+로컬 개발 포트 **3004** (전체 표는 [[Home]]).
 
 DB 이름은 URI 경로가 아니라 `lib/db.ts`에서 `hamhibokka`로 못 박는다 → [[MongoDB Atlas]]
 
