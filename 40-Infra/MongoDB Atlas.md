@@ -2,14 +2,23 @@
 title: MongoDB Atlas
 type: infra
 tags: [infra, mongodb]
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # MongoDB Atlas
 
 Cluster0 하나에 서비스별 DB를 나눠 쓴다 → [[인증과 세션 공유]]
 
-`user` · `vocab` · `math` · `fit` · `hamhibokka` · `admin` · `local`
+| DB | 쓰는 곳 |
+|---|---|
+| `user` | 회원 — 다섯 앱 공용 |
+| `vocab` | SnapWord |
+| `math` | SnapNote |
+| `fit` | FitLog |
+| `hamhibokka` | 2hbk |
+| `type` | TypeLog |
+
+`admin` · `local` 은 MongoDB 시스템 DB다. 우리가 만든 것이 아니다.
 
 ## Vercel에서 접속하려면
 
@@ -48,11 +57,38 @@ mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB, ... });
 | SnapNote | `math` |
 | FitLog | `fit` |
 | 2hbk | `hamhibokka` |
+| TypeLog | `type` |
 
 통합 admin 도 이 클러스터를 쓰지만 **앱 DB 를 직접 읽지는 않는다.**
 회원(`user`)만 직접 읽고 나머지는 각 앱의 API 를 거친다 → [[통합 admin]]
 
 `MONGO_DB` 환경 변수로 덮어쓸 수 있게 두되, 평소에는 설정하지 않는다.
+
+## 새 앱의 DB 를 만들 때
+
+**앱별 DB 는 Atlas 에서 미리 만든다.** 기술적으로는 mongoose 가 첫 쓰기에 자동으로
+만들지만, 그렇게 두면 배포하고 한참 뒤에야 DB 목록에 나타나 **어느 앱 것이 있고
+없는지 대시보드만 봐서는 알 수 없다.** 미리 만들어 두면 목록이 곧 앱 목록이 된다.
+(2026-09-04 사용자 확인 — 지금까지 그렇게 해 왔다)
+
+> ⚠️ **Atlas 는 빈 DB 를 만들 수 없다.** DB 를 만들 때 컬렉션 하나를 함께 만들어야
+> 하고, 그 컬렉션을 지우면 DB 도 사라진다. 그래서 첫 컬렉션 하나는 손으로 만든다.
+
+1. Atlas → Browse Collections → **Create Database**
+   - Database name: 그 앱의 dbName (아래 표)
+   - Collection name: 그 앱의 첫 컬렉션 하나 (나머지는 mongoose 가 만든다)
+2. **DB 사용자에게 그 DB 의 readWrite** — 기존 사용자가 `readWriteAnyDatabase` 면 그대로 된다
+3. **Network Access `0.0.0.0/0`** — 이미 있다
+4. **`MONGO_URI`** 를 `.env.local` 과 Vercel 프로젝트에 넣고 **재배포**
+   (환경 변수는 배포 시점에 스냅샷된다 → [[Vercel 배포 패턴]])
+
+인덱스는 모델을 처음 쓸 때 mongoose 가 만든다(`autoIndex` 기본값이 켜져 있다).
+컬렉션도 첫 쓰기에 생기므로 1번에서 전부 만들 필요는 없다.
+
+TypeLog 에 점검 스크립트를 뒀다(`scripts/check-db.mjs`, `npm run db:check`).
+연결·**DB 이름 대조**(URI 경로 vs 코드가 못 박은 값)·컬렉션·인덱스·환경 변수를
+한 번에 보여준다. `-- --ensure` 를 붙이면 빠진 인덱스를 만든다.
+다른 앱에도 그대로 복사해 쓸 수 있다.
 
 ### 연결 문자열 형식
 

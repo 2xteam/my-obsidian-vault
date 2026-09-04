@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/myjane
 local: C:\Dev\myjane
 branch: main
 tags: [project, myjane]
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # MyJane
@@ -84,6 +84,9 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 ## 예정 작업
 
 - [x] **통합 admin** (2026-09-04) — 앱별 탭. 회원·공지·문의·요약 → [[통합 admin]]
+- [x] **앱 아이콘 교체** (2026-09-04) — 사용자가 준 사진에서 파생하던 것을
+      직접 그린 소문자 `mj` SVG 로 바꿨다. j 의 꼬리가 게이지 호에 내접해 이어진다.
+      원본 `public/app-icon.svg` · `npm run icons` → [[앱 공통 UI와 아이콘]]
 - [ ] 토큰 사용 로그(`token_logs`) — 어느 앱의 어느 기능에서 썼는지
 - [ ] 각 앱에 남은 회원가입·PIN 재설정 화면 정리
 - [x] 2hbk 이메일 로그인 경로 · 세션 서명 토큰 (2026-09-03) → [[2hbk]]

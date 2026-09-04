@@ -87,6 +87,41 @@ if (searchParams.get("pin") !== ADMIN_PIN) ...  // URL 이라 접근 로그에 �
 화면에 0 이 찍혀도 아무도 오류라고 알려주지 않는다. **표를 만들면 값이 그럴듯한지
 실제 DB 와 대조한다.**
 
+### ⚠️ 로컬에서 앱을 `dev:https` 로 띄우면 포털이 앱을 못 부른다
+
+**2026-09-04에 겪었다.** 관리 화면에서 **앱 조회가 전부 502** 였다.
+포털 자기 데이터(회원·권한)는 200 이라 "권한 문제"처럼 보이지 않고
+"앱이 다 죽었나" 처럼 보인다.
+
+```
+/api/admin/me                    200  ✓
+/api/admin/users                 200  ✓
+/api/admin/apps/fitlog/stats     502  ✗ "FitLog에 연결할 수 없습니다 (fetch failed)"
+```
+
+원인은 스킴이다. `resolveOrigin()` 이 로컬에서 `http://localhost:<포트>` 를 부르는데
+`next dev --experimental-https` 로 띄운 앱은 **HTTPS 만 받는다.** 평문 요청에는
+연결을 그냥 닫아서 `fetch failed` 만 남는다.
+
+대응 — `.env.local` 에 **`ADMIN_LOCAL_HTTPS=1`**.
+
+- `resolveOrigin()` 이 `https://localhost:<포트>` 를 부른다
+- 앱들이 **mkcert 자기서명 인증서**를 쓰므로 Node 가 인증서를 못 믿는다.
+  이 플래그가 켜져 있고 개발 모드일 때만 `NODE_TLS_REJECT_UNAUTHORIZED=0` 을 둔다
+  (`lib/appAdminApi.ts`). 더 엄격하게 하려면 셸에서 `NODE_EXTRA_CA_CERTS` 를
+  mkcert 루트 CA(`%LOCALAPPDATA%\mkcertootCA.pem`)로 지정한다 —
+  Node 가 **시작할 때** 읽으므로 `.env.local` 에 넣어도 안 먹는다
+- 운영에서는 이 완화가 절대 켜지지 않는다
+
+### ⚠️ 선언한 기능을 앱이 갖고 있지 않으면 "불러오는 중…" 에서 멈춘다
+
+`lib/adminApps.ts` 에 `features: ["stats", ...]` 를 적었는데 그 앱에
+`/api/admin/stats` 가 없으면, 화면이 영원히 로딩으로 남는다. 같은 날 TypeLog 에서
+겪었다 — `stats` 를 선언하고 엔드포인트를 나중에 만들었다.
+
+**기능을 선언하기 전에 엔드포인트를 먼저 만든다.** 순서를 바꾸면 화면이
+거짓말을 한다.
+
 ### 앱이 안 떠 있을 때를 구분해서 알린다
 
 재배포 중이거나 내려가 있으면 `fetch failed` 가 난다. 그대로 두면 "데이터 없음"과
