@@ -2,7 +2,7 @@
 title: Vercel 배포 패턴
 type: pattern
 tags: [pattern, vercel, infra]
-updated: 2026-09-03
+updated: 2026-09-04
 ---
 
 # Vercel 배포 패턴
@@ -26,8 +26,16 @@ SnapWord · SnapNote · myjane · FitLog · 2hbk를 옮기며 실제로 겪은 �
 
 ### ⚠️ Framework Preset이 `Other`로 잡히면 조용히 404
 
-2026-09-03 2hbk에서 겪었다. **빌드는 성공(`● Ready`)하는데 `/`가 404**다.
+2026-09-03 2hbk, **2026-09-04 TypeLog에서 또 겪었다.**
+**빌드는 성공(`● Ready`)하는데 `/`가 404**다.
 커스텀 도메인은 물론 `<프로젝트>.vercel.app`까지 404라 도메인 문제로 착각한다.
+
+TypeLog는 **저장소가 비어 있을 때 프로젝트를 만들어서** 감지할 것이 없었다.
+코드를 올리기 전에 Vercel을 연결하면 반드시 이렇게 된다.
+
+> ⚠️ **다른 앱의 `vercel.json`을 복사하면 이 대응이 사라진다.** FitLog의 파일에는
+> `framework`가 없다 — 프리셋이 자동 감지돼서 필요가 없었기 때문이다.
+> 그걸 새 프로젝트에 복사하면 이 함정을 그대로 밟는다. TypeLog가 그랬다.
 
 원인은 Output Directory다. `Other` 프리셋은
 
@@ -40,6 +48,18 @@ Output Directory   `public` if it exists  ← 정적 사이트로 취급한다
 연결되지 않는다.** 에러도 경고도 없다.
 
 확인 — `npx vercel project inspect <프로젝트>`의 Framework Settings를 본다.
+
+**한 줄로 가려내는 법**: `public/`에 있는 파일을 직접 불러 본다.
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://<도메인>/            # 404
+curl -s -o /dev/null -w "%{http_code}\n" https://<도메인>/icon.png    # 200 ← 이 조합이면 확정
+```
+
+**루트는 404인데 `public/` 파일은 200**이면 `public/`이 출력 디렉터리로 서빙되고
+있다는 뜻이다. 도메인·DNS 문제라면 둘 다 404다. TypeLog에서 DNS·도메인 검증·
+alias·빌드 로그를 전부 확인하고 나서야 여기에 도달했는데, 이 두 줄이면 처음부터
+좁힐 수 있었다.
 
 대응 — **`vercel.json`에 `"framework": "nextjs"`를 적는다.** 이 값이 대시보드
 설정을 덮으므로 저장소에 두면 다시 어긋날 일이 없다. 대시보드에서만 고치면

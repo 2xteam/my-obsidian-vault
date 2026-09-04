@@ -593,9 +593,15 @@ FitLog에서 가져오는 것은 **디자인뿐**이다(2026-09-04 사용자 지
 ## 진행 상황
 
 - [x] **저장소 · 도메인 · Vercel 연결** (2026-09-04) — `2xteam/typelog` · `typelog.myjane.co.kr`
+- [x] **운영 배포 확인** (2026-09-04) — `typelog.myjane.co.kr` 200, `icn1`.
+      `vercel.json`에 `"framework": "nextjs"`가 없어 루트가 404였다
+      → [[Vercel 배포 패턴]]의 Framework Preset 함정
+- [x] **앱 아이콘** (2026-09-04) — `public/app-icon.svg` + `npm run icons`로 PNG 5종
 - [x] **로컬 클론 · Next.js 15 골격 · 포트 3005** (2026-09-04)
       `package.json` · `tsconfig` · `next.config.ts` · `vercel.json`(icn1) · `.gitignore` ·
       `.env.example` · `CLAUDE.md` · `README.md` · `.claude/launch.json`
+- [ ] 앱 아이콘 32px·16px — 접힌 귀와 반짝임이 뭉개진다.
+      파비콘만 단순한 형태(검토 기록의 B안)로 바꿀지 결정
 - [x] **결쩜사 토큰 + 시트 CSS + `Sheet.tsx` + 소개 페이지** (2026-09-04)
       `app/globals.css`는 **라이트 전용**으로 새로 썼다 — 테마 선택이 없으니
       `[data-theme]` 블록도 두지 않는다. FitLog의 1,151줄을 그대로 가져오면
