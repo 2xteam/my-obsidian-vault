@@ -47,9 +47,21 @@ Network Access에 **`0.0.0.0/0`** 이 있어야 한다. Vercel Functions는 고�
 대응 — 앱마다 **`dbName`을 코드에서 명시**한다. URI 경로가 무엇이든 이 값이 이긴다.
 
 ```ts
-const MONGODB_DB = (process.env.MONGO_DB ?? "fit").trim() || "fit";
+const MONGODB_DB = "fit"; // 상수. 환경 변수로 바꿀 수 없다
 mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB, ... });
 ```
+
+> ⚠️ **2026-09-04 같은 사고가 다시 났다.** TypeLog 의 `quizzes`·`resulttypes`·
+> `attempts` 33건이 2hbk 의 `hamhibokka` DB 안에 들어가 있었다. `lib/db.ts` 는
+> "URI 경로를 믿지 않는다" 며 `dbName` 을 명시하고 있었는데도다 — 그 값이
+> `process.env.MONGO_DB ?? "type"` 이었고, 2hbk 의 `.env.local` 을 복사할 때
+> **`MONGO_DB=hamhibokka` 도 같이 따라왔다.** URI 경로를 안 믿는 대신 환경 변수를
+> 믿은 셈이다.
+>
+> **DB 이름을 환경 변수로 받지 않는다.** 그 앱의 고정된 사실이므로 코드에만 둔다.
+> `MONGO_USER_DB` 도 같은 이유로 없앴다(공유 DB `user` 는 서비스 전체의 상수다).
+> 증상은 여전히 조용하다 — 오류도 경고도 없고, `type` DB 는 컬렉션 3개가 전부
+> 0건인 채로 있었다.
 
 | 앱 | dbName |
 |---|---|
@@ -62,7 +74,8 @@ mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB, ... });
 통합 admin 도 이 클러스터를 쓰지만 **앱 DB 를 직접 읽지는 않는다.**
 회원(`user`)만 직접 읽고 나머지는 각 앱의 API 를 거친다 → [[통합 admin]]
 
-`MONGO_DB` 환경 변수로 덮어쓸 수 있게 두되, 평소에는 설정하지 않는다.
+**`MONGO_DB` 환경 변수는 두지 않는다.** 있으면 언젠가 다른 앱 값이 복사돼 들어온다.
+`.env.example` 에도 적지 않는다 — 적어두면 채우게 된다.
 
 ## 새 앱의 DB 를 만들 때
 
