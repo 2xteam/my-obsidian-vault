@@ -8,7 +8,7 @@ local: C:\Dev\SnapWord
 branch: main
 db: vocab
 tags: [project, myjane]
-updated: 2026-09-02
+updated: 2026-09-05
 ---
 
 # SnapWord
@@ -45,6 +45,11 @@ Next.js 15 (App Router) · React 19 · TypeScript · MongoDB Atlas · OpenAI · 
 - [x] Vercel 이관 · 도메인 연결 · DB·메일 정상
 - [x] 하단 공통 푸터 (MyJane 링크)
 - [ ] `NEXT_PUBLIC_COOKIE_DOMAIN`을 **Config 타입**으로 재등록 → 세션 공유 활성화
+
+## AI 채팅
+
+스트리밍·되묻기·이어질 질문·스켈레톤 — 세 앱이 같은 구조를 쓴다
+→ [[AI 채팅 패턴]]
 
 ## 2026-09-02 변경
 

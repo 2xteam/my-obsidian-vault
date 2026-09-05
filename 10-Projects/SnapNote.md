@@ -8,7 +8,7 @@ local: C:\Dev\SnapNote
 branch: master
 db: math
 tags: [project, myjane]
-updated: 2026-09-02
+updated: 2026-09-05
 ---
 
 # SnapNote
@@ -42,6 +42,11 @@ SnapWord와 동일 (Next.js 15 · MongoDB · OpenAI · Vercel `icn1`).
 - [x] Vercel 이관 · 도메인 · DB · 메일(PIN 찾기) 정상
 - [x] 하단 공통 푸터
 - [ ] `NEXT_PUBLIC_COOKIE_DOMAIN` Config 재등록
+
+## AI 채팅
+
+스트리밍·되묻기·이어질 질문·스켈레톤 — 세 앱이 같은 구조를 쓴다
+→ [[AI 채팅 패턴]]
 
 ## 2026-09-02 변경
 
