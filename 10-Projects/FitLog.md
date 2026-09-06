@@ -88,6 +88,17 @@ DB 이름은 URI 경로가 아니라 **코드에서 `dbName: "fit"`으로 못 �
 > 업로드 필드 이름이 서버와 달라(`image` vs `file`) 등록이 **한 번도 되지
 > 않았다.** 새 라우트를 만들 때 `readMultipartImage`가 읽는 이름을 확인한다.
 
+## ⚠️ 개발 서버 두 개가 같은 `.next`를 쓰면 둘 다 망가진다
+
+`npm run dev`(3003)가 떠 있는데 검증용으로 하나 더 띄우면 서로의 청크를 지운다.
+화면은 뜨는데 스크립트가 404로 떨어지고 결국 응답이 멈춘다. **두 번 겪었다.**
+
+  npm run dev         3003 · .next
+  npm run dev:verify  3013 · .next-verify   ← 따로 쓴다
+
+빌드도 마찬가지다. 개발 서버가 떠 있으면 `NEXT_DIST_DIR=.next-build npm run build`.
+끝나면 `git checkout tsconfig.json next-env.d.ts` — Next가 타입 경로를 고쳐 쓴다.
+
 ## 추출 정확도 장치
 
 인바디 결과지는 내부 계산이 맞아떨어진다. 이 성질로 Vision의 숫자 오인식을 잡는다
