@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/myjane
 local: C:\Dev\myjane
 branch: main
 tags: [project, myjane]
-updated: 2026-09-06
+updated: 2026-09-07
 ---
 
 # MyJane
@@ -106,3 +106,15 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 - [x] 2hbk 이메일 로그인 경로 · 세션 서명 토큰 (2026-09-03) → [[2hbk]]
 - [ ] 세션 쿠키를 HttpOnly 서버 쿠키로 전환 검토 (현재는 클라이언트가 읽는 쿠키)
 - [x] FitLog 카드 추가 · 카테고리 구조로 랜딩 재구성 (2026-09-02)
+
+## 팔레트 원본이 여기 있다
+
+여섯 앱이 쓰는 색의 단일 원본이 이 저장소에 있다.
+
+```
+design/palette.json          ← 여기만 고친다
+npm run palette -- --write   ← 여섯 앱의 app/palette.css 가 다시 만들어진다
+```
+
+쓰기 전에 대비 31건을 검사하고 하나라도 미달이면 아무 파일도 쓰지 않는다.
+`app/palette.css` 는 여섯 앱 모두 생성 파일이다 → [[먹청 톤 팔레트]]

@@ -8,7 +8,7 @@ local: C:\Dev\SnapNote
 branch: master
 db: math
 tags: [project, myjane]
-updated: 2026-09-05
+updated: 2026-09-07
 ---
 
 # SnapNote
@@ -60,3 +60,9 @@ SnapWord와 동일 (Next.js 15 · MongoDB · OpenAI · Vercel `icn1`).
 - 상단 네비를 주 기능(`Home` `Folders` `Print`)만 남기고
   부가 기능(`My` `Notice` `Q&A` `Logout`)은 `More ▾`로 접었다.
   모바일 햄버거 메뉴에서는 구분선 아래로 내려간다
+
+## 색
+
+여섯 앱이 **먹청 팔레트**를 공유한다. 원본은 `myjane/design/palette.json` 하나다.
+색을 바꿀 때는 거기만 고치고 myjane 에서 `npm run palette -- --write` 를 돌린다.
+`app/palette.css` 는 생성 파일이라 직접 고치지 않는다 → [[먹청 톤 팔레트]]

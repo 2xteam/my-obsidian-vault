@@ -8,7 +8,7 @@ local: C:\Dev\2hbk
 branch: main
 db: hamhibokka
 tags: [project, myjane]
-updated: 2026-09-04
+updated: 2026-09-07
 ---
 
 # 2hbk
@@ -212,3 +212,9 @@ dev 서버를 멈추고 `.next`를 지운 뒤 다시 띄워야 한다.
 - [x] 운영 확인 — 포털 로그인 → 2hbk 진입 → `/api/me` 200
       (두 배포의 `SESSION_SECRET`이 맞는다는 증거다)
 - [ ] 옛 저장소 아카이브 · Azure 잔여 리소스 정리 확인
+
+## 색
+
+여섯 앱이 **먹청 팔레트**를 공유한다. 원본은 `myjane/design/palette.json` 하나다.
+색을 바꿀 때는 거기만 고치고 myjane 에서 `npm run palette -- --write` 를 돌린다.
+`app/palette.css` 는 생성 파일이라 직접 고치지 않는다 → [[먹청 톤 팔레트]]

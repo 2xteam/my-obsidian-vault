@@ -8,7 +8,7 @@ local: C:\Dev\typelog
 branch: main
 db: type
 tags: [project, myjane]
-updated: 2026-09-04
+updated: 2026-09-07
 ---
 
 # TypeLog
@@ -796,3 +796,9 @@ WEIGHTS = [2, 3, 5, 2, 7, 3, 5, 2, 7, 3]
 ## 아직 정하지 않은 것
 
 지금은 없다. 정해야 할 것이 생기면 여기 적는다.
+
+## 색
+
+여섯 앱이 **먹청 팔레트**를 공유한다. 원본은 `myjane/design/palette.json` 하나다.
+색을 바꿀 때는 거기만 고치고 myjane 에서 `npm run palette -- --write` 를 돌린다.
+`app/palette.css` 는 생성 파일이라 직접 고치지 않는다 → [[먹청 톤 팔레트]]

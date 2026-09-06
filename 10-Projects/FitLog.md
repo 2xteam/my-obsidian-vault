@@ -8,7 +8,7 @@ local: C:\Dev\fitlog
 branch: main
 db: fit
 tags: [project, myjane]
-updated: 2026-09-05
+updated: 2026-09-07
 ---
 
 # FitLog
@@ -247,3 +247,9 @@ upsert라 날짜를 바꾸면 다른 날 기록을 덮어쓴다. 그래서 이 �
 
 실제 인바디 결과지 7장(270S/270×2/970/720/구형×2, 2014~2026)이 있다.
 기종이 모두 달라 추출 검증 데이터로 적합하다.
+
+## 색
+
+여섯 앱이 **먹청 팔레트**를 공유한다. 원본은 `myjane/design/palette.json` 하나다.
+색을 바꿀 때는 거기만 고치고 myjane 에서 `npm run palette -- --write` 를 돌린다.
+`app/palette.css` 는 생성 파일이라 직접 고치지 않는다 → [[먹청 톤 팔레트]]
