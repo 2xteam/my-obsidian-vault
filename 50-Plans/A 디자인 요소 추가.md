@@ -3,7 +3,7 @@ title: A 디자인 요소 추가
 type: plan
 tags: [plan, design]
 updated: 2026-09-07
-status: myjane 구현 완료 — 화면 확인 대기
+status: 여섯 앱 구현 완료 — 배포 대기
 applies-to: [myjane]
 ---
 
@@ -95,10 +95,11 @@ myjane 소개의 `ABOUT MYJANE`. 단계가 **3개 이상이고 순서가 중요�
 ## 진행 순서
 
 1. [x] myjane 에 네 요소 구현 · 대비 검사 — `fcd7097`
-2. [ ] 화면으로 확인받기  ← **여기**
+2. [x] 화면으로 확인받기 — 라운딩을 12px → 6px 로 한 번 더 줄였다
 3. [x] [[여섯 앱 디자인 시스템]] 에 규칙 적기
 4. [x] `design:check` 규칙 G — 라운딩 2개 · 밑줄 1개를 넘으면 막는다
-5. [ ] 다섯 앱으로 옮기기
+5. [x] 다섯 앱으로 옮기기 — `SnapWord 10d9f43` `SnapNote 66a7ff3` `fitlog 58373b5` `2hbk 24effc0` `typelog 523729f`
+6. [ ] 배포  ← **여기**
 
 ## myjane 구현 결과 (2026-09-07 · `fcd7097`)
 
@@ -156,6 +157,58 @@ petrol 그라디언트로 칠해진다. **대비 1.00 으로 측정됐다** — 
 - 스크린샷이 5초 타임아웃으로 실패하거나 빈 화면이 나온다
 
 → [[개발 서버와 검증 환경]]
+
+## 다섯 앱으로 옮긴 결과 (2026-09-07)
+
+`myjane c7e52e1` 에서 CSS 원본을 **`design/elements.css`** 로 옮겼다. 팔레트와
+같은 구조다 — `npm run elements -- --write` 가 여섯 앱의 `app/elements.css` 를
+쓴다. 그 스크립트는 CSS 만 옮기고 나머지는 **검사만** 한다:
+`layout.tsx` 의 import 순서 · `ScrollProgress.tsx` 존재 · 다섯 앱 `Sheet.tsx` 동일성.
+
+| 앱 | 밑줄 자리 | 타임라인 |
+|---|---|---|
+| SnapWord | WHAT YOU GET "옮겨 적지 않아도" | `STEPS` → `.flow` |
+| SnapNote | WHAT YOU GET "다시 풀 것만" | `STEPS` → `.flow` |
+| fitlog | WHAT YOU GET "흐름을" | `STEPS` → `.flow` |
+| 2hbk | THREE MODES "같이 해도" | `STEPS` → `.flow` |
+| typelog | HOW IT WORKS "세 걸음" | 인라인 배열 → `STEPS` + `.flow` |
+
+typelog 는 밝은 plain 시트가 마무리 CTA 뿐이었다. 거기엔 라운딩 포인트가
+가므로 밑줄은 tint 시트(HOW IT WORKS)에 넣었다. 타임라인 번호도 다섯 앱 중
+혼자 `pill--gold` 였는데 `.flow-num` 으로 통일했다.
+
+### 옮기면서 새로 알게 된 것 셋
+
+**① 다크 테마에서 형광펜은 성립하지 않는다.**
+형광펜은 "밝은 띠 + 어두운 글자" 다. 다크에서는 글자가 밝아야 카드 위에서
+읽히니 띠도 어두워야 하고, 그러면 금색이 탁한 올리브(rgb 96 108 87)로 보인다 —
+실제로 얼룩처럼 렌더됐다. 띠를 밝히면 반대로 글자가 3.4:1 로 떨어진다.
+그래서 `[data-theme="dark"]` 에서는 **금색 밑줄 3px** 로 바꿨다. 글자 위를
+덮지 않으니 글자 13.66:1, 금색 선 9.7:1 로 둘 다 지킨다. myjane 은 다크가
+없어서 이 블록이 걸리지 않는다.
+
+**② 타임라인 가운데 정렬은 기본값이 될 수 없다.**
+myjane 의 시트는 헤드라인이 가운데라 `margin-inline: auto` 가 맞았지만, 다섯
+앱은 왼쪽 정렬이라 타임라인이 제 헤드라인보다 안쪽으로 들어가 어긋났다.
+`.flow--center` 로 뺐다 — 가운데 정렬 시트에서만 붙인다.
+
+**③ 어휘가 둘이라 CSS 한 파일이 그냥은 안 돌았다.**
+myjane 은 `--text`/`--accent-soft`/`--text-dim`, 다섯 앱은
+`--text-primary`/`--accent-subtle`/`--text-secondary` 다. `elements.css` 안에서
+`--el-*` 로 묶어 다리를 놓았다. 그리고 다섯 앱에 **`--accent-ink` 와
+`--gold-soft` 가 아예 없었다** — 그래서 타임라인 번호가 면적용 `var(--accent)`
+를 글자색으로 쓰고 있었다. 팔레트 어휘에 추가했다.
+
+⚠️ 다리(`var(--x, 대체값)`)는 **검사 규칙 B 가 못 본다.** 규칙 B 의 정규식은
+대체값 없는 `var(--x)` 만 잡는다. 여기서는 오타를 잡아주지 못한다.
+
+### 검사기가 주석을 읽던 문제
+
+`elements.css` 주석에 설명으로 쓴 `var(--radius-lg)` 와 `var(--x)` 를 실제
+사용으로 읽어 "미정의 변수 7건" 을 냈다. 규칙 B~C 가 주석을 지운 사본을 보게
+고쳤다. C 기준선이 46 → **45** 로 줄었다.
+
+> 설명을 쓰면 화내는 도구는 설명을 안 쓰게 만든다.
 
 ## 옮길 때
 
