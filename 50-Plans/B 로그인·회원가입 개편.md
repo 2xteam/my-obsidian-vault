@@ -42,6 +42,27 @@ applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 - **`emailVerified` 필드** — 2hbk 가 이미 쓰고 있다. 공용으로 올려 쓴다
 - **식별자 판별** — `lib/identifier.ts` (`@` 있으면 이메일, 숫자 9~11 이면 전화번호)
 
+## ⚠️ `update-email` 라우트가 이미 있다 — 그런데 인증이 없다
+
+`myjane/app/api/auth/update-email/route.ts` 를 **먼저 읽을 것.**
+전화번호 회원의 이메일을 받는 자리가 이미 있는데 두 가지가 빠져 있다.
+
+```ts
+user.email = email;
+await user.save();     // ← 인증 없이 바로 저장한다
+```
+
+- **메일 인증을 하지 않는다.** 남의 이메일을 넣어도 그대로 저장된다
+- **권한 확인이 요청 본문의 `phone` + `userId` 뿐이다.**
+  세션 쿠키가 아니라 클라이언트가 보낸 값을 믿는다 → 다른 사람 계정에
+  이메일을 심을 수 있다
+
+작업 3(소급 수집)은 **이 라우트를 새로 만드는 게 아니라 고치는 일**이다.
+세션에서 사용자를 확인하고, 저장 대신 인증 메일을 보내도록 바꾼다.
+
+`verify-identity` 라우트도 `phone` + `name` 으로 계정을 찾는다 — 비밀번호 찾기
+흐름의 일부다. 함께 확인할 것.
+
 ## 작업 1 — 이메일 인증
 
 ```
