@@ -3,7 +3,7 @@ title: A 디자인 요소 추가
 type: plan
 tags: [plan, design]
 updated: 2026-09-07
-status: 착수
+status: myjane 구현 완료 — 화면 확인 대기
 applies-to: [myjane]
 ---
 
@@ -94,11 +94,68 @@ myjane 소개의 `ABOUT MYJANE`. 단계가 **3개 이상이고 순서가 중요�
 
 ## 진행 순서
 
-1. [ ] myjane 에 네 요소 구현 · 대비 검사
-2. [ ] 화면으로 확인받기
-3. [ ] [[여섯 앱 디자인 시스템]] 에 규칙 적기 (특히 4번의 "어디에 넣나")
-4. [ ] `design:check` 에 규칙 추가 — 카드 포인트가 한 화면에 3개 이상이면 경고
+1. [x] myjane 에 네 요소 구현 · 대비 검사 — `fcd7097`
+2. [ ] 화면으로 확인받기  ← **여기**
+3. [x] [[여섯 앱 디자인 시스템]] 에 규칙 적기
+4. [x] `design:check` 규칙 G — 라운딩 2개 · 밑줄 1개를 넘으면 막는다
 5. [ ] 다섯 앱으로 옮기기
+
+## myjane 구현 결과 (2026-09-07 · `fcd7097`)
+
+| 요소 | 어디에 | 파일 |
+|---|---|---|
+| 진행 띠 | `.site-top` 안 (sticky 로 바꿨다) | `components/ScrollProgress.tsx` |
+| 형광 밑줄 | ABOUT MYJANE 헤드라인 "계정뿐이에요" | `.mark` |
+| 타임라인 | 새 시트 "시작하는 순서" 3단계 | `FLOW` in `app/page.tsx` |
+| 라운딩 포인트 | 히어로 · 마무리 CTA | `.sheet--point` |
+
+CSS 는 `app/globals.css` 가 아니라 **`app/elements.css`** 에 있다. B·C 세션이
+같은 트리에서 globals.css 를 고치고 있어서 충돌을 피했다.
+
+### ⚠️ 밟은 함정 둘 — 다섯 앱에 옮길 때 그대로 만난다
+
+**① `@import` 로는 순서를 못 만든다.**
+`globals.css` 안에 `@import "./elements.css";` 를 두면 안 된다. `@import` 는 파일
+맨 앞이라야 하니 규칙이 **늘 globals.css 보다 먼저** 들어가고, 특이도가 같은
+`.sheet--point` 가 `.sheet { border-radius: 24px }` 에 진다. 조용히 진다 —
+에러가 없고 라운딩만 안 먹는다. `layout.tsx` 에서 globals.css **다음 줄**에
+불러야 한다.
+
+**② `.headline span` 이 `.mark` 를 이긴다.**
+`.headline span` 은 특이도 (0,1,1), `.mark` 는 (0,1,0). 그 규칙이
+`background-clip: text` + `color: transparent` 라서 금색 띠가 사라지고 글자가
+petrol 그라디언트로 칠해진다. **대비 1.00 으로 측정됐다** — 눈으로는 "그냥 강조
+글자" 로 보여서 놓치기 쉽다. `.headline .mark` 로 특이도를 맞추고
+`-webkit-text-fill-color: currentColor` 로 되돌린다.
+
+### 팔레트에 없던 토큰
+
+`--point-ink` 가 myjane 어휘에 빠져 있었다 (`scripts/sync-palette.mjs` 의 `NAMES.myjane`).
+`design:check` 규칙 B 가 잡았다. 다섯 앱 어휘에는 원래 있었다.
+
+### 측정 (1280×900 · `dev:verify` 3010)
+
+| 자리 | 대비 | 기준 |
+|---|---|---|
+| 밑줄 띠 위 글자 (24px/700) | 12.48 | 3.0 |
+| 타임라인 제목 (15.2px/700) | 14.67 | 4.5 |
+| 타임라인 본문 (13.6px) | 4.94 | 4.5 |
+| 배지 `--accent-ink` (11px/700) | 5.46 | 4.5 |
+| 배지 `--point-ink` (11px/700) | 5.23 | 4.5 |
+| 진행 띠 vs 헤더 배경 | 6.98 | 3.0 (비텍스트) |
+
+### ⚠️ 이 화면을 CDP 로 잴 때
+
+브라우저 창이 다른 창에 가려 있으면 —
+
+- `innerWidth` 가 **0** 이 된다. 그 상태의 폭·높이 측정값은 전부 쓰레기다.
+  색(computed style)은 멀쩡하다. 재기 전에 `innerWidth` 를 먼저 확인한다
+- `transition` 이 진행 중인 값에서 멈춘다. `.scroll-progress::after` 의
+  `transform` 이 `scaleX(0)` 으로 읽혀 "안 움직인다" 고 오진했다.
+  `transition: none !important` 를 잠깐 얹고 다시 읽으면 실제 값이 나온다
+- 스크린샷이 5초 타임아웃으로 실패하거나 빈 화면이 나온다
+
+→ [[개발 서버와 검증 환경]]
 
 ## 옮길 때
 
