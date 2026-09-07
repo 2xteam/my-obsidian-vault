@@ -2,7 +2,7 @@
 title: Home
 type: moc
 tags: [moc]
-updated: 2026-09-04
+updated: 2026-09-07
 ---
 
 # Home
@@ -18,6 +18,7 @@ updated: 2026-09-04
 | [[Patterns MOC]] | 반복해서 쓰는 개발 패턴과 함정 |
 | [[Infra MOC]] | 도메인 · DB · 스토리지 · 배포 |
 | `00-Meta` | 볼트 사용 규칙, AI 협업 규칙 |
+| `50-Plans` | 여러 세션이 나눠 진행하는 작업의 계획서 → [[Plans MOC]] |
 | `Templates` | 새 노트를 만들 때 쓰는 틀 |
 
 ## 운영 중인 서비스
