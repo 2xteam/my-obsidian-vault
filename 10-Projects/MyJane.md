@@ -118,3 +118,20 @@ npm run palette -- --write   ← 여섯 앱의 app/palette.css 가 다시 만들
 
 쓰기 전에 대비 31건을 검사하고 하나라도 미달이면 아무 파일도 쓰지 않는다.
 `app/palette.css` 는 여섯 앱 모두 생성 파일이다 → [[먹청 톤 팔레트]]
+
+## 소개 페이지의 카테고리 순서
+
+2026-09-07에 사용자가 정했다. 카테고리 시트를 이 순서로 쌓는다.
+
+```
+HEALTH  건강 기록   FitLog
+TYPE    성향 기록   TypeLog
+STUDY   공부 기록   SnapWord · SnapNote
+HABIT   습관 기록   2hbk
+ABOUT MYJANE
+```
+
+시트 배경은 흰색 / 연청록을 **번갈아** 쓴다(`.sheet` / `.sheet--tint`).
+순서를 바꿀 때 `sheet--tint` 가 연속되지 않는지 확인할 것 → [[결쩜사 페이지 패턴]]
+
+푸터 저작권 표기는 `myjane` 으로 쓴다(`MyJane` 아님).
