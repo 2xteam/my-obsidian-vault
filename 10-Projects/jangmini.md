@@ -65,14 +65,14 @@ DB 이름은 URI 경로가 아니라 코드에서 **`jangmini` 로 못 박는다
 
 ## 데이터
 
-`jangmini` DB, 컬렉션 7개. 이름은 **단수로 쓴다**(아래 함정 참고).
+`jangmini` DB, 컬렉션 7개. 이름은 **모델 정의에서 명시한다**(아래 함정 참고).
 
 | 컬렉션 | 무엇이 있나 |
 |---|---|
 | `portfolio` | Notion·이력서에서 수집한 콘텐츠. `kind` 로 구분 |
 | `settings` | key-value 설정. **재배포 없이** 한도·모델·킬스위치를 바꾼다 |
-| `reader` | 관리자가 수동 발급하는 계정. 만료일 있음. `role` 로 admin 겸용 |
-| `reader_history` | 질문 이력 **겸 카운터** |
+| `readers` | 관리자가 수동 발급하는 계정. 만료일 있음. `role` 로 admin 겸용 |
+| `readers_history` | 질문 이력 **겸 카운터** |
 | `suggestions` | 추천 질문 (고정 `key`) |
 | `answers` | 사전 생성 답변 캐시 |
 | `usage` | 일별 집계 — 전역 예산 캡 판정용 |
@@ -83,7 +83,7 @@ DB 이름은 URI 경로가 아니라 코드에서 **`jangmini` 로 못 박는다
 `portfolio.visibility` 가 안전장치다. 연락처·급여·재직 중 내부 정보는 `private` 로
 넣고 **공개 조회 쿼리가 집지 않게** 한다. 프롬프트로만 막으면 언젠가 새 나간다.
 
-카운터를 `reader_history` 로 겸하는 이유 — 별도 카운터 컬렉션을 두면 "제한에
+카운터를 `readers_history` 로 겸하는 이유 — 별도 카운터 컬렉션을 두면 "제한에
 걸렸는데 무슨 질문이었는지 모른다"가 된다. 대신 인덱스가 필수다:
 `{clientId,createdAt}` · `{ipHash,createdAt}` · `{readerId,createdAt}`.
 
@@ -122,20 +122,27 @@ IP 는 **원문을 저장하지 않고 `sha256(ip+salt)` 만** 둔다.
 
 ## 함정
 
-### ⚠️ mongoose 가 컬렉션 이름을 복수로 바꾼다
+### ⚠️ 컬렉션 이름은 모델 정의에서 명시한다
 
-`mongoose.model("Reader", schema)` 는 컬렉션을 **`readers`** 로 만든다.
-Atlas 에 손으로 만든 `reader` 와 어긋난 채 **조용히 새 컬렉션이 생긴다.**
-오류도 경고도 없고 조회만 0건이 된다.
+mongoose 는 모델 이름을 복수로 바꿔 컬렉션 이름을 만든다. 그런데 이 앱의 이름이
+섞여 있어서 자동 규칙으로는 어느 쪽도 다 맞출 수 없다.
 
-**세 번째 인자로 이름을 명시한다.**
+| 모델 | 자동으로 생기는 이름 | 실제로 쓸 이름 |
+|---|---|---|
+| `Portfolio` | `portfolios` | **`portfolio`** (Atlas 에 손으로 만든 것) |
+| `Reader` | `readers` | `readers` ✅ 우연히 맞는다 |
+| `ReaderHistory` | `readerhistories` | **`readers_history`** |
+
+어긋나면 **조용히 새 컬렉션이 생긴다.** 오류도 경고도 없고 조회만 0건이 된다.
+
+그래서 **일곱 모델 전부 세 번째 인자로 이름을 넘긴다.** 우연히 맞는 것까지
+포함해서 — 안 그러면 어느 것이 명시됐고 어느 것이 운인지 알 수 없다.
 
 ```ts
-mongoose.model("Reader", schema, "reader");
+mongoose.model("Reader", schema, "readers");
+mongoose.model("ReaderHistory", schema, "readers_history");
+mongoose.model("Portfolio", schema, "portfolio");
 ```
-
-`portfolio` · `settings` · `reader` · `reader_history` · `suggestions` ·
-`answers` · `usage` 전부 해당한다.
 
 ### ⚠️ Notion 이미지 URL 은 1시간 뒤 깨진다
 

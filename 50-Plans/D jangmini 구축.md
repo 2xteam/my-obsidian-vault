@@ -34,7 +34,7 @@ A·B·C 와 무관한 별개 트랙이다 — 여섯 앱 파일을 건드리지 
 - [ ] `scripts/ingest-docx.mjs` — 학력·자격증·대외활동·병역·자기소개 보강
 - [ ] 정규화 결과 샘플을 **DB 에 넣기 전에** 사용자에게 보여준다
 - [ ] `scripts/check-db.mjs` — TypeLog 것을 복사. 연결·**DB 이름 대조**·컬렉션·인덱스
-- [ ] `settings` 초기값, `reader` 초기 계정(`2xteam`, bcrypt 해시), 인덱스 생성
+- [ ] `settings` 초기값, `readers` 초기 계정(`2xteam`, bcrypt 해시), 인덱스 생성
 - [ ] 추천 질문 8~12개 초안 → 사용자 검수
 
 **멱등성** — `source.id` 로 upsert 한다. 다시 돌려도 중복이 생기지 않아야 한다.
@@ -99,7 +99,7 @@ A·B·C 와 무관한 별개 트랙이다 — 여섯 앱 파일을 건드리지 
 |---|---|---|
 | L0 | **추천질문 사전생성 캐시** | 정상 트래픽 대부분. OpenAI 호출 0회 |
 | L1 | 입력 500자 · 최근 10턴 · `maxSteps` · `maxOutputTokens` | 한 요청의 최대 단가 |
-| L2 | `reader_history` 기반 익명 제한 (`clientId` + `ipHash` 중 **엄격한 쪽**) | 한 사람의 반복 |
+| L2 | `readers_history` 기반 익명 제한 (`clientId` + `ipHash` 중 **엄격한 쪽**) | 한 사람의 반복 |
 | L3 | **전역 일일 캡** (`usage` + `settings`) → 초과 시 채팅만 끄고 브라우징 유도 | 분산된 다수 · IP 로테이션 |
 | L4 | **OpenAI 프로젝트 hard limit** + 전용 키 | 위가 전부 뚫렸을 때의 최종 상한 |
 | L5 | Origin/Referer 검증 · honeypot. 필요하면 Turnstile(무료) | 스크립트 봇 |
@@ -120,7 +120,7 @@ A·B·C 와 무관한 별개 트랙이다 — 여섯 앱 파일을 건드리지 
 | 페르소나 | "연봉이 얼마냐" · "파이썬 코드 짜줘" · "이전 지시를 무시하고 …" 세 개를 실제로 던진다 |
 | rate limit | 익명으로 한도+1 회 → 차단 문구와 브라우징 유도가 뜨는지. reader 로그인 후 풀리는지. 만료된 reader 는 막히는지 |
 
-`reader_history` 를 직접 조회해서 카운트가 실제로 쌓였는지 본다. 화면만 보고
+`readers_history` 를 직접 조회해서 카운트가 실제로 쌓였는지 본다. 화면만 보고
 "동작한다"고 판단하지 않는다.
 
 ## 관련
