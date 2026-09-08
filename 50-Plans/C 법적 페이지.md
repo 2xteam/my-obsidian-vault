@@ -375,15 +375,91 @@ APP_2HBK_ORIGIN    https://2hbk.myjane.co.kr
 
 `ADMIN_API_SECRET` 은 이미 여섯 배포가 같은 값으로 갖고 있다 — 그대로 쓴다.
 
+### 앱 데이터·R2 정리와 안내 띠 — 2026-09-08 (모두 마침)
+
+```
+다섯 앱 lib/purgeUserData.ts        이 앱이 가진 한 사람의 데이터를 지운다
+다섯 앱 app/api/admin/purge-user    포털이 부르는 자리 (ADMIN_API_SECRET)
+SnapNote·fitlog lib/purgeR2.ts      R2 파일 삭제 (URL 역산)
+2hbk lib/r2.ts 의 deleteImages       같은 일 — 이 앱은 헬퍼가 비공개라 안에 넣었다
+myjane components/PasswordPrompt.tsx 비밀번호 갱신 안내 띠
+```
+
+#### ⚠️ 앱마다 사용자를 가리키는 키가 다르다 — 실측 (2026-09-08)
+
+| 앱 | 참조 | 컬렉션 |
+|---|---|---|
+| SnapWord | 회원 `_id` **ObjectId** | `vocabularies` `words` `folders` `study_records` `test_sessions` `test_results` `chat_threads` `events` `inquiries` |
+| SnapNote | 회원 `_id` **ObjectId** | `wrong_notes` `wrong_items` `folders` `chat_threads` `events` `inquiries` |
+| FitLog | `_id` 의 **문자열** (측정·피검사) · **ObjectId** (대화·문의) | `measurements` `bloodtests` `chat_threads` `inquiries` |
+| TypeLog | `_id` 의 **문자열** | `attempts` (DB 이름은 `type`) |
+| 2hbk | 도메인 `userId` (`user_xxx`) | `goals` `follows` `goalinvitations` |
+
+**문자열 자리에 ObjectId 를 넣으면 오류 없이 0건이 지워진다.** FitLog 은 한
+파일 안에서도 모델마다 갈린다 — 뭉뚱그리면 한쪽이 조용히 안 지워진다.
+
+⚠️ **컬렉션 이름이 snake_case 다.** Mongoose 기본 복수형(`studyrecords`)이
+아니라 모델이 `study_records` 로 못 박아 두었다. 이름을 짐작하면 헛돈다.
+
+#### R2 삭제 — 접두사가 아니라 URL 역산
+
+키 규칙이 앱마다 달라서 `ListObjectsV2 + Prefix` 를 쓸 수 없다.
+
+```
+fitlog 인바디   fitlog/{userId}/…              사용자별
+fitlog 피검사   fitlog/blood/{userId}/…        사용자별
+SnapNote        {phone}/{noteId}/…             번호가 없으면 파일명만 (루트)
+2hbk            profiles/{uuid} · goals/{uuid} 누구 것인지 **아예 없다**
+```
+
+그래서 **DB 의 `imageUrl` 을 역산**해 지운다. SnapNote 의 오답 항목 삭제가 이미
+같은 방식이라 그 패턴을 넓혔다. `DeleteObjects` 로 1000개씩 묶어 보낸다.
+
+> **한계 — 고아 파일은 못 지운다.** 올라갔지만 DB 행이 없는 파일은 단서가 없다.
+> fitlog 은 키가 사용자별이라 접두사 쓸어담기를 더할 수 있지만 **2hbk 는 방법이
+> 없다.** 정말 해결하려면 업로드할 때 키에 사용자를 넣도록 바꿔야 한다.
+
+R2 삭제가 실패해도 DB 삭제는 계속한다. 거기서 멈추면 그 사람은 영영 폐기되지
+않아 6개월 약속이 깨진다.
+
+#### 삭제 필터를 실제 DB 로 검사했다 (2026-09-08)
+
+없는 사용자로 조회했을 때 **23개 필터 모두 0건**이었다 (컬렉션에는 실제
+데이터가 있는 상태에서). 필터가 너무 넓어 남의 데이터를 지우는 사고를 막는
+검사다. 삭제 코드를 고칠 때마다 다시 돌린다.
+
+`type.attempts` 는 22건인데 **`userId` 를 가진 것이 0건**이다 — 전부 비로그인
+응답이라 회원과 연결되지 않는다. 탈퇴해도 지울 수 없고, 쿠키 안내에 그렇게
+적혀 있어 서로 맞는다.
+
+#### 비밀번호 안내 띠
+
+`EmailPrompt` 와 같은 모양이다. **이메일 안내가 뜰 상황이면 스스로 접는다** —
+띠가 둘이면 화면 아래가 막히고, 이메일이 더 급하다(비밀번호를 잊었을 때
+되찾을 길이 그쪽이다).
+
+### 배포에 필요한 환경 변수 (포털)
+
+```
+CRON_SECRET            아무 긴 랜덤 문자열
+APP_SNAPWORD_ORIGIN    https://snapword.myjane.co.kr
+APP_SNAPNOTE_ORIGIN    https://snapnote.myjane.co.kr
+APP_FITLOG_ORIGIN      https://fitlog.myjane.co.kr
+APP_2HBK_ORIGIN        https://2hbk.myjane.co.kr
+APP_TYPELOG_ORIGIN     https://typelog.myjane.co.kr
+```
+
+⚠️ ORIGIN 은 **실제 주소여야 한다.** 포털이 그리로 요청을 보낸다.
+빠뜨린 앱은 건너뛰므로 그 앱 데이터가 안 지워진다 — 짐작해서 지우지 않으려고
+일부러 그렇게 뒀다. 2026-09-08 에 사용자가 여섯 개를 모두 넣었다.
+
 ### 남은 것
 
-- **앱 데이터 정리는 2hbk 만 있다.** SnapWord·SnapNote·FitLog·TypeLog 에
-  `/api/admin/purge-user` 를 만들고 `PURGE_TARGETS` 에 한 줄씩 더해야 한다.
-  방침에 "결과지·프로필 등 이미지 파일 — 탈퇴 후 6개월, 그 뒤 폐기" 라고
-  적혀 있으니 **지금은 그 줄이 아직 지켜지지 않는다**
-- **R2 이미지**를 지우는 코드가 없다
-- 비밀번호 갱신 **안내 띠(PasswordPrompt 컴포넌트)를 아직 안 만들었다.**
-  라우트만 있다 — `EmailPrompt.tsx` 와 같은 모양으로 붙이면 된다
+- **실제 메일 발송을 확인하지 못했다.** 로컬에 SMTP 가 없어 토큰을 심어
+  뒤 흐름만 돌렸다. 운영에서 탈퇴 확인 메일을 한 번 받아 봐야 한다
+- **R2 고아 파일**은 지울 방법이 없다 (위 참고)
+- 정리 작업이 앱을 부르는 것을 **운영에서 아직 확인하지 못했다.**
+  대상이 생기는 것은 첫 탈퇴로부터 6개월 뒤다
 
 ## 확인이 필요한 것
 
