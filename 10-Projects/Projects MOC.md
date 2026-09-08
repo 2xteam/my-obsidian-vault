@@ -2,7 +2,7 @@
 title: Projects MOC
 type: moc
 tags: [moc]
-updated: 2026-09-03
+updated: 2026-09-08
 ---
 
 # Projects MOC
@@ -35,6 +35,9 @@ updated: 2026-09-03
 
 ## 별개 서비스
 
+- [[jangmini]] — AI 챗봇형 개인 포트폴리오 · `jangmini.myjane.co.kr` · `jangmini` · **계획**
+  **myjane 서비스가 아니다.** 도메인만 하위에 두고 회원·세션·디자인·admin 을 공유하지
+  않는다. 왜 다른지는 [[jangmini]] 첫 표에 있다 → [[D jangmini 구축]]
 - [[Ignite]] — 건축사무소 · Vercel 이관 대기
 
 ## 참고 사이트
