@@ -2,7 +2,7 @@
 title: Cloudflare R2
 type: infra
 tags: [infra, r2, storage]
-updated: 2026-09-04
+updated: 2026-09-08
 ---
 
 # Cloudflare R2
@@ -18,6 +18,7 @@ updated: 2026-09-04
 | `ignite` | Ignite 프로젝트 이미지 |
 | `templete` | klead 등 공유 버킷 (앱별 프리픽스로 분리) |
 | `2hbk` | 2hbk 프로필·목표 이미지 |
+| `jangmini` | jangmini 포트폴리오 이미지 (Notion 에서 이관) |
 
 계정이 서비스별로 다를 수 있으니 `R2_ACCOUNT_ID`를 확인한다.
 
@@ -56,6 +57,35 @@ FitLog는 인바디 결과지 원본을 보관한다. 이유는 세 가지.
 3. 종이 결과지를 버릴 수 있게 함
 
 용지 1장이 200KB 남짓이라 비용은 미미하다.
+
+## 외부의 presigned URL 을 R2 로 옮길 때
+
+**받아 두고 나중에 올리는 구조로는 동작하지 않는다.**
+
+Notion API 가 주는 이미지 URL 은 S3 presigned 이고 `X-Amz-Expires=3600` 이다.
+2026-09-08 jangmini 에서 실측 — 수집 78분 뒤 **403 Forbidden**. 수집 스냅샷에
+URL 을 담아 뒀다가 이관 스크립트를 돌리면 전부 실패한다.
+
+```bash
+# 만료 여부는 URL 파라미터로 계산된다
+X-Amz-Date=20260908T050544Z  +  X-Amz-Expires=3600
+```
+
+대응 — 이관 스크립트가 **원본에서 새 URL 을 받아 그 자리에서 내려받아 올린다.**
+`jangmini/scripts/migrate-images.mjs` 가 그 형태다(페이지마다
+`GET /v1/pages/{id}/markdown` → 곧바로 fetch → PutObject).
+
+### 멱등성은 내용 해시로
+
+원본이 매번 다른 presigned URL 을 주므로 URL 로는 "같은 파일" 을 알 수 없다.
+키에 내용 해시를 넣으면 같은 이미지가 같은 키가 된다.
+
+```
+projects/<slug>/<n>-<sha256 앞 12자>.<ext>
+```
+
+`HeadObject` 로 이미 있으면 건너뛴다. jangmini 두 번째 실행에서 73장 건너뜀 ·
+0 실패였다. 키에 해시가 있으므로 `cache-control: immutable` 도 안전하다.
 
 ## 토큰 권한 확인하는 법
 
