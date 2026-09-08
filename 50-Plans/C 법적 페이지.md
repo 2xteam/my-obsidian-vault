@@ -3,7 +3,7 @@ title: C 법적 페이지
 type: plan
 tags: [plan, legal, privacy]
 updated: 2026-09-07
-status: 초안 작성됨 — 법률 검토 대기
+status: 배포됨 (2026-09-08) — 법률 검토 대기
 applies-to: [myjane]
 ---
 
@@ -452,6 +452,45 @@ APP_TYPELOG_ORIGIN     https://typelog.myjane.co.kr
 ⚠️ ORIGIN 은 **실제 주소여야 한다.** 포털이 그리로 요청을 보낸다.
 빠뜨린 앱은 건너뛰므로 그 앱 데이터가 안 지워진다 — 짐작해서 지우지 않으려고
 일부러 그렇게 뒀다. 2026-09-08 에 사용자가 여섯 개를 모두 넣었다.
+
+### ⚠️ CRON_SECRET 에 한글이 들어가면 배포가 **2초 만에** 실패한다
+
+2026-09-08 에 겪었다. 빌드 로그가 아니라 그 앞에서 멈춘다.
+
+```
+Error: The `CRON_SECRET` environment variable contains characters that are not
+valid in HTTP headers: non-ASCII character (0x3157) at position 0 …
+```
+
+`0x3157 0x3151 0x3161` 은 한글 자모 **ㅗ ㅑ ㅡ** 다. 한/영 전환이 안 된 채로
+입력된 것이다. Vercel 은 이 값을 크론 요청의 `Authorization` 헤더에 실으므로
+**ASCII 만 허용한다.**
+
+증상이 헷갈린다 — 사이트는 멀쩡하다. **이전 배포가 그대로 서비스되기 때문**에
+새 라우트만 404 가 나고 기존 화면은 200 이다. 도메인·라우팅 문제로 착각하기 쉽다.
+
+```
+확인   npx vercel ls          → 최신 배포가 ● Error, Duration 2s
+       npx vercel inspect <url> --logs
+       Duration 이 몇 초면 빌드 전에 멈춘 것이다 — 설정 문제다
+```
+
+`crons` 가 없으면 Vercel 은 이 검사를 하지 않는다. 거꾸로, 이 오류가 났다는 것은
+**크론 설정이 읽혔다는 뜻**이기도 하다.
+
+### 배포 확인 (2026-09-08, 운영)
+
+```
+포털 화면        / · /account/withdraw · /signup · /legal/* 모두 200
+탈퇴 화면        "여섯 서비스가 함께 닫힙니다" · "6개월 동안 보관한 뒤 폐기" 렌더됨
+보호된 API       cron/purge · account/withdraw · password-prompt 모두 401
+틀린 시크릿      cron/purge 401 (남이 못 지운다)
+엉터리 토큰      "링크가 만료되었거나 올바르지 않습니다"
+가입 동의        동의 없이 register → 400
+다섯 앱          purge-user 무인증 403(2hbk·fitlog·SnapWord·SnapNote) · 401(typelog)
+앱 /register     404 — 가입은 포털로만
+방침 연락처      myjane0602@gmail.com · 010-4922-0202 · Google (Gmail SMTP) 들어감
+```
 
 ### 남은 것
 
