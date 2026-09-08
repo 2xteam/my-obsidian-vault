@@ -2,7 +2,7 @@
 title: MongoDB Atlas
 type: infra
 tags: [infra, mongodb]
-updated: 2026-09-04
+updated: 2026-09-08
 ---
 
 # MongoDB Atlas
@@ -70,6 +70,7 @@ mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB, ... });
 | FitLog | `fit` |
 | 2hbk | `hamhibokka` |
 | TypeLog | `type` |
+| jangmini | `jangmini` |
 
 통합 admin 도 이 클러스터를 쓰지만 **앱 DB 를 직접 읽지는 않는다.**
 회원(`user`)만 직접 읽고 나머지는 각 앱의 API 를 거친다 → [[통합 admin]]
@@ -137,6 +138,50 @@ TypeLog 에 점검 스크립트를 뒀다(`scripts/check-db.mjs`, `npm run db:ch
 Windows 로컬에서 SRV 조회가 실패하면 표준 URI(`mongodb://` + 샤드 3개)를 쓰게 되는데,
 **Atlas가 클러스터를 이전하면 샤드 호스트명이 바뀌어 조용히 끊긴다.**
 서버는 SRV 조회에 문제가 없으므로 **Vercel 환경 변수에는 `mongodb+srv://`** 를 쓴다.
+
+#### 왜 로컬에서 SRV 가 실패하나 — 원인을 찾았다 (2026-09-08)
+
+**이 PC 의 Node DNS 리졸버가 `127.0.0.1` 로 잡혀 있고, 그 로컬 DNS 가 SRV 질의를
+거부한다.** Atlas 문제도, 방화벽 문제도 아니다.
+
+증상은 `querySrv ECONNREFUSED _mongodb._tcp.<클러스터>.mongodb.net` 인데,
+"연결이 거부됐다"고 읽혀 Atlas Paused 나 Network Access 를 먼저 뒤지게 된다.
+헷갈리는 점은 **PowerShell `Resolve-DnsName -Type SRV` 는 정상으로 3건을 준다** —
+Windows 리졸버와 Node 리졸버가 서로 다른 서버를 쓴다.
+
+한 줄로 가려낸다.
+
+```bash
+node -e "const d=require('dns');console.log(d.getServers())"
+# ['127.0.0.1'] 이면 이 문제다
+```
+
+확인 방법 — 공개 DNS 로 바꿔 물어보면 바로 나온다.
+
+```bash
+node -e "const d=require('dns');d.setServers(['8.8.8.8']);d.resolveSrv('_mongodb._tcp.cluster0.<해시>.mongodb.net',(e,r)=>console.log(e?e.code:r.length))"
+```
+
+**대응은 코드를 고치는 것이 아니다.** `dns.setServers()` 를 앱에 넣으면 서버에서도
+그 DNS 를 쓰게 되어 더 나빠진다. 기존 방침대로 **로컬 `.env.local` 만 표준 URI,
+Vercel 은 `mongodb+srv://`** 로 나눠 둔다.
+
+> 부수 효과로 **srv 호스트명을 추측하지 않고 확인할 수 있다.** 표준 URI 의 샤드가
+> `ac-xxxx-shard-00-00.<해시>.mongodb.net` 이면 srv 호스트는
+> `cluster0.<해시>.mongodb.net` 일 텐데, `Resolve-DnsName -Type SRV` 로 조회해
+> 샤드 세 개가 그대로 나오면 확정이다. Atlas 대시보드를 열지 않아도 된다.
+
+#### 점검 스크립트가 기준값을 환경 변수에서 읽으면 점검이 무의미하다
+
+`scripts/check-db.mjs` 는 "코드가 못 박은 DB 이름"과 "URI 경로의 이름"을 대조해
+위의 사고를 잡아내려고 만든 것이다. 그런데 TypeLog 판은 기준값 자체를
+`process.env.MONGO_DB ?? "type"` 로 읽는다 — **다른 앱의 `MONGO_DB` 가 복사돼
+들어와 있으면 그 잘못된 값을 "코드가 못 박은 값"이라고 출력하며 통과시킨다.**
+
+기준값은 **상수여야 한다.** 그리고 스크립트는 `MONGO_DB` 와
+`NEXT_PUBLIC_COOKIE_DOMAIN` 처럼 **있으면 안 되는 변수의 존재 자체를 경고**해야
+한다. 없는 것을 확인하는 절을 따로 두는 편이 낫다 — jangmini 판이 그 예다
+(`C:\Dev\jangmini\scripts\check-db.mjs`).
 
 ## 서버리스 연결 설정
 
