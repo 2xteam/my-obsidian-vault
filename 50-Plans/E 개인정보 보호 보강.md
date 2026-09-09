@@ -337,10 +337,17 @@ SnapNote 토큰 없음 401 · upload-image 무인증 401
 2hbk·typelog  /api/me 401/200/401(sv) · typelog 는 ADMIN 시크릿 Bearer 가 있어도 쿠키로 200
 ```
 
+### 배포 — 2026-09-09
+
+사용자가 세 배포에 `SESSION_SECRET` 을 넣은 뒤 여섯 저장소와 볼트를 커밋·푸시했다
+(`myjane 30dd4c7 · SnapWord 250fece · SnapNote 9de7f31 · fitlog 6f78fdd · 2hbk 849c620 · typelog 323de15`).
+운영 DB 에는 `scripts/ensure-ttl.mjs --apply` 로 TTL 인덱스 9개를 만들었다(`createdAt_1` 두 개는 지우고).
+운영 확인 결과는 아래 "배포 확인" 에 적는다.
+
 ### 배포 전에 해야 하는 것 (사용자)
 
-- [ ] Vercel **SnapWord · SnapNote · fitlog** 에 `SESSION_SECRET` (포털과 같은 값) → 없으면 세 앱 API 전부 500/401
-- [ ] **여섯 배포를 같은 날.** 포털만 먼저 올리면 앱들이 새 쿠키를 못 읽는다(옛 세션은 이행기라 살아 있음)
+- [x] Vercel **SnapWord · SnapNote · fitlog** 에 `SESSION_SECRET` (포털과 같은 값) — 2026-09-09 사용자 완료
+- [x] **여섯 배포를 같은 날.** 2026-09-09 한 번에 푸시
 - [ ] 배포 뒤 브라우저에서: devtools `document.cookie` 에 `snap_session` 이 **없고** `snap_user` 에 전화번호·이메일이 없음 · 다섯 앱 오가며 로그인 유지 · 로그아웃 뒤 API 401
 - [ ] 이메일만으로 가입한 계정으로 SnapWord 폴더 생성 (A9 확인)
 - [ ] 2hbk R2 옛 키(`profiles/{uuid}`) 이관은 하지 않았다 — 파일이 8+3건이라 `check:images` 로 정리하는 편이 낫다
