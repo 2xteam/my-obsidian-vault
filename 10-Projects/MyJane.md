@@ -107,6 +107,12 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 - [x] 세션 쿠키를 HttpOnly 서버 쿠키로 전환 (2026-09-09) — `snap_session` · `snap_auth` · 표시용 `snap_user` → [[인증과 세션 공유]] · [[E 개인정보 보호 보강]]
 - [x] FitLog 카드 추가 · 카테고리 구조로 랜딩 재구성 (2026-09-02)
 
+## `/link` — SNS 프로필 링크 모음 (2026-09-09)
+
+인스타그램 본문에는 링크가 걸리지 않아 프로필 링크 하나를 `www.myjane.co.kr/link` 로 둔다.
+여섯 서비스의 **소개 페이지**(로그인 전 화면)로 가는 카드 목록이고, 그때 홍보하는 서비스를 맨 위에 올린다.
+검색 색인은 막았다(`robots: noindex`) → [[SNS 소개 카드와 게시글]]
+
 ## 팔레트 원본이 여기 있다
 
 여섯 앱이 쓰는 색의 단일 원본이 이 저장소에 있다.
