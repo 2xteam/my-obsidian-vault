@@ -647,6 +647,47 @@ valid in HTTP headers: non-ASCII character (0x3157) at position 0 …
 - 정리 작업이 앱을 부르는 것을 **운영에서 아직 확인하지 못했다.**
   대상이 생기는 것은 첫 탈퇴로부터 6개월 뒤다
 
+## 크론 폐기 — 확인하는 방법 (2026-09-09 가이드)
+
+방침의 "탈퇴 후 6개월, 그 뒤 폐기" 는 포털의 `app/api/cron/purge` 가 하루 한 번(18:00 UTC = 03:00 KST) 돌아야 지켜진다.
+확인은 세 층으로 한다. **대상이 없으면 아무 일도 안 하는 것이 정상**이라 "돌았는데 조용하다" 와 "안 돌았다" 를 구분해야 한다.
+
+### 1. 크론이 등록됐나 — Vercel 대시보드
+
+`vercel.com → myjane 프로젝트 → Settings → Cron Jobs`. `/api/cron/purge` 와 스케줄 `0 18 * * *` 가 보여야 한다.
+없으면 `vercel.json` 의 `crons` 가 배포에 안 실렸다는 뜻이다(빌드 로그 확인).
+같은 화면의 **Run** 버튼으로 지금 한 번 돌릴 수 있다.
+
+### 2. 돌았나 — 로그
+
+`Deployments → 최신 Production → Logs` (또는 로컬에서 `npx vercel logs <배포 URL>`) 에서 `GET /api/cron/purge` 줄을 본다.
+날마다 03:00 KST 전후에 한 줄씩 있어야 한다. 상태가 401 이면 `CRON_SECRET` 이 없거나 다르다(→ [[Vercel 배포 패턴]] 한글 자모 함정).
+응답 본문은 `{ ok, purged: N, apps: {…} }` 모양이다 — `purged: 0` 은 대상이 없었다는 뜻이다.
+
+### 3. 실제로 지우나 — 테스트 계정으로 한 번
+
+```
+1) 테스트 계정으로 가입 → 다섯 앱 중 둘에 기록을 하나씩 남긴다 (예: SnapWord 폴더 · fitlog 체중)
+2) 포털 /account/withdraw 로 탈퇴 확정 (메일 링크까지)
+3) Atlas 에서 그 회원 문서의 withdrawnAt 을 7개월 전으로 고친다
+   db.users.updateOne({ email: "<테스트 주소>" }, { $set: { withdrawnAt: new Date(Date.now() - 210*24*3600*1000) } })
+4) 크론을 기다리거나, 로컬에서 수동으로 한 번 부른다 (값은 출력하지 않는다)
+   curl -s -H "Authorization: Bearer $CRON_SECRET" https://www.myjane.co.kr/api/cron/purge
+5) 확인 — user.users 에 그 문서 없음 · vocab.folders 등 두 앱 컬렉션에 그 _id 로 0건 · R2 파일 없음
+```
+
+수동 호출은 `CRON_SECRET` 값을 셸에 그대로 치지 말고 `vercel env pull` 로 받은 파일에서 읽어 넣는다.
+**검증이 끝나면 테스트 계정이 남지 않았는지 다시 본다** — 지워진 것이 곧 성공이다.
+
+### 실패했을 때 보는 순서
+
+| 증상 | 원인 |
+|---|---|
+| 로그에 줄이 없다 | 크론 미등록 · `vercel.json` 미배포 |
+| 401 | `CRON_SECRET` 누락·불일치 |
+| `purged: 0` 인데 대상이 있다 | `withdrawnAt` 이 6개월 안 됨 · `lib/accountLifecycle.ts` 기간 확인 |
+| 회원은 지워졌는데 앱 데이터가 남았다 | `APP_<앱>_ORIGIN` 누락(그 앱은 건너뛴다) · 앱의 `ADMIN_API_SECRET` 불일치 → 응답 `apps` 에 앱별 결과가 있다 |
+
 ## 확인이 필요한 것
 
 2026-09-07 에 사용자에게 물어 넷을 정했다. 남은 것은 아래 "아직 안 정해진 것".
