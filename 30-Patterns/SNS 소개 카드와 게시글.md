@@ -69,13 +69,31 @@ updated: 2026-09-09
 - 첫 줄이 잘리는 피드용 **짧은 안**을 함께 둔다
 - 다듬은 기준을 caption.md 끝에 적어 다음 사람이 같은 기준으로 고칠 수 있게 한다
 
+## 다섯 앱 모두 있다 (2026-09-09)
+
+| 앱 | 카드 | 문구 | 시각 요소(4장) |
+|---|---|---|---|
+| FitLog | `fitlog/docs/marketing/instagram-fitlog.html` | 운영자 이야기 포함 (인스타 톤 안) | 삼각 레이더 · 피검사 스포크 · 추이 |
+| SnapWord | `SnapWord/docs/marketing/instagram-snapword.html` | 소개 페이지 문장 · **운영자 이야기 자리 비움** | 사진 → 단어장 카드 |
+| SnapNote | `SnapNote/docs/marketing/instagram-snapnote.html` | 〃 | 컬러 시험지 → 모노톤 노트 |
+| 2hbk | `2hbk/docs/marketing/instagram-2hbk.html` | 〃 | 20칸 스티커판 (13 채움) |
+| TypeLog | `typelog/docs/marketing/instagram-typelog.html` | 〃 | 타입 카드 + 도감 |
+
+네 앱은 **한 생성기**로 만들었다 — `myjane/docs/marketing/gen-cards.py` (문구·시각 요소 스펙 + 공통 CSS).
+문구를 고칠 땐 HTML 을 직접 고쳐도 되고, 여러 앱을 함께 바꿀 땐 생성기를 고쳐 다시 돌린다(FitLog 는 손으로 만든 원본이라 생성기 밖).
+각 저장소의 `export-cards.mjs` 는 범용판이라 폴더의 `instagram-*.html` 을 모두 PNG 로 뽑는다.
+
+카드 8장 구성은 다섯 앱이 같다 — 표지(dark) → WHY(tint) → HOW IT WORKS → 시각 요소 → WHAT YOU GET(tint) → ONE ACCOUNT → 태도/CARE(gold) → START(dark).
+네 앱의 게시글은 운영자 이야기가 없어 소개 문장으로만 썼다. caption.md 위에 **이야기가 들어갈 자리와 힌트**를 적어 두었다 —
+이야기가 오면 첫 문단으로 올린다. 해시태그는 앱마다 5개(검색 태그 3 + 맥락 1 + 이름 1).
+
 ## 첫 사례 — FitLog (2026-09-09)
 
 `C:\Dev\fitlog\docs\marketing\instagram-fitlog.html` (8장) · `instagram-fitlog-caption.md`
 운영자의 이야기: 2012년 부정맥 시술 → 14년 뒤 올해 초 악화 → 재진단 → 4월부터 11kg 감량하며 수치를 기록하고
 권고를 검색 없이 보려고 만들었다 → 무료 공개. 카드 5장(피검사)은 그날 확정한 스포크 차트를 그대로 그렸다.
 
-## 다음 앱을 할 때
+## 다음에 손볼 때
 
 - SnapWord · SnapNote 는 학습 앱이라 "하지 않는 것" 장에 **아이 사진·이름을 남기지 않는다** 류가 들어갈 것이다
 - 2hbk 는 스티커판이 주인공 → [[2hbk]] "스티커판이 주인공이다"
