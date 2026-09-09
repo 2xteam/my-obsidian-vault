@@ -3,7 +3,7 @@ title: F 보호자·자녀 계정
 type: plan
 tags: [plan, auth, privacy, children]
 updated: 2026-09-09
-status: 계획 — 착수 전 (사용자 결정 2026-09-07 · 계획서 2026-09-09)
+status: 구현 완료 (2026-09-09) — 운영 확인 남음
 applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 ---
 
@@ -22,7 +22,47 @@ applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 여섯 앱이 공유하는 `users` 와 세션 토큰의 의미가 바뀐다. 한 세션에서 끝낼 크기가 아니고,
 잘못 잡으면 나중에 고치기 어렵다(E 에서 phone 키를 걷어내는 데 라우트 68개를 만졌다).
 
-## 결정해야 할 것 (사용자)
+## 사용자 결정 (2026-09-09)
+
+- 자녀는 `users` 의 **별도 row**. `parentId` 로 보호자를 가리킨다 (팔로우 때문에 `userId` 도 필요)
+- 로그인할 때 **보호자인지 어느 자녀인지 골라** 들어간다
+- FitLog 건강정보 동의는 **자녀를 추가할 때 체크박스**로 받는다
+- 만 14세가 되면 **이메일·비밀번호를 등록해 독립**하는 절차를 둔다
+
+## 구현 (2026-09-09, 같은 날)
+
+```
+여섯 앱  models/User.ts            parentId · independenceOnVerify · independentAt
+여섯 앱  lib/sessionToken.ts       claims.gid (자녀 세션이면 보호자 _id)
+다섯 앱  lib/auth.ts               Viewer.guardianId (참고용 — 앱 동작은 그대로)
+포털     lib/family.ts             MAX_CHILDREN 5 · createChild · pickToken(5분) · purgeUserAcrossApps · familyFollow
+         lib/profileSession.ts     프로필로 세션 발급 (child 표시 · hasEmail true)
+         lib/serverSession.ts      requireSessionUser 가 자녀 세션(gid)을 **기본 403** — allowChild 옵션
+         app/api/auth/login        자녀가 있으면 choose + pickToken + profiles (세션 미발급)
+         app/api/auth/pick-profile 고른 프로필로 세션 (자녀면 gid)
+         app/api/auth/switch       GET 목록 · POST 전환 — 자녀→보호자는 보호자 비밀번호 필요
+         app/api/account/children  GET · POST(법정대리인 동의 필수 · 건강·국외 선택) · [id] PATCH · DELETE(즉시 폐기) · [id]/independence
+         app/account/children      자녀 관리 화면 · app/account/switch 전환 화면 · components/ProfilePicker
+         app/api/auth/verify-email independenceOnVerify → parentId 해제 · independentAt · 세션 폐기
+         app/api/cron/purge        보호자 폐기 때 자녀도 함께 · purgeUserAcrossApps 공용화
+         components/LandingAuth    헤더에 이름(자녀) + 전환 링크
+2hbk     app/api/admin/family-follow  가족 전원 양방향 approved (ADMIN_API_SECRET)
+방침     6항을 실제 동작으로 다시 썼다 (자녀 프로필 · 즉시 삭제 · 독립) · 가입 화면 문구
+```
+
+- 나이는 `올해 - 출생연도 - 1 ≥ 14` (생일을 모르므로 보수적)
+- 자녀 프로필은 이메일이 없어 앱 `EmailBanner` 가 뜨지 않게 세션에 `child: true`
+- 자녀 세션에서 포털 계정 API 를 부르면 403 `{ child: true }` — 동의 화면은 "보호자 프로필에서" 안내
+
+### 운영에서 확인할 것
+
+- [ ] 자녀 추가 → 로그인 시 프로필 선택 → 자녀로 SnapWord 폴더 생성 → 보호자 프로필에는 안 보임
+- [ ] 자녀 세션으로 /account/withdraw · /api/account/consents → 403
+- [ ] 2hbk 친구 목록에 가족이 서로 보임
+- [ ] 자녀 삭제 → 다섯 앱 0건 (응답 `purged`)
+- [ ] 독립: 출생연도 14세 이상 → 메일 → 링크 → 자기 이메일로 로그인 · 보호자 목록에서 사라짐
+
+## 결정해야 할 것 (원래 제안표 — 위 결정으로 확정)
 
 | 물음 | 제안 | 이유 |
 |---|---|---|
@@ -53,14 +93,14 @@ applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 
 ## 순서
 
-1. [ ] 사용자 결정표 확정
-2. [ ] `guardianId` 여섯 스키마 + 토큰 `gid` + `getViewer` (앱은 아직 아무 동작 변화 없음)
-3. [ ] 자녀 CRUD + 법정대리인 동의 게이트(`guardianAgreedAt` — E 의 분리 동의 셋 중 하나, 게이트만 비어 있다)
-4. [ ] 프로필 전환 (포털 UI + `/api/auth/switch`) · 앱 상단에 "누구로 보고 있는지" 표시
-5. [ ] 자녀 프로필에서 계정 설정 403
-6. [ ] 2hbk 자동 팔로우
-7. [ ] 자녀 삭제 = 즉시 폐기 (purge-user 재사용)
-8. [ ] 방침 6항 문구 되돌리기 · 가입 화면의 "만 14세 이상 확인" 을 "자녀는 가입 후 추가" 안내로 · `POLICY_VERSION` 올림
+1. [x] 사용자 결정표 확정 (2026-09-09)
+2. [x] `guardianId` 여섯 스키마 + 토큰 `gid` + `getViewer` (앱은 아직 아무 동작 변화 없음)
+3. [x] 자녀 CRUD + 법정대리인 동의 게이트(`guardianAgreedAt` — E 의 분리 동의 셋 중 하나, 게이트만 비어 있다)
+4. [x] 프로필 전환 (포털 UI + `/api/auth/switch`) · 앱 상단에 "누구로 보고 있는지" 표시
+5. [x] 자녀 프로필에서 계정 설정 403
+6. [x] 2hbk 자동 팔로우
+7. [x] 자녀 삭제 = 즉시 폐기 (purge-user 재사용)
+8. [x] 방침 6항 문구 되돌리기 · 가입 화면 문구 — `POLICY_VERSION` 은 같은 날(2026-09-09) 개정이라 그대로 두었다
 9. [ ] 검증 — 자녀 토큰으로 탈퇴·동의 API 403 · 자녀 기록이 보호자 프로필에 섞이지 않음 · 자녀 삭제 뒤 다섯 앱 0건
 
 ## 함정 (예상)
