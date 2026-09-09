@@ -23,8 +23,14 @@ updated: 2026-09-09
 <앱>/docs/marketing/instagram-<앱>-caption.md    게시글 본문 (기본안 · 짧은 안 · 다듬은 기준)
 ```
 
-- 캡처는 운영자가 한다. HTML 상단의 **[카드만 보기]** 로 한 장씩 띄우고 방향키로 넘기며 캡처한다.
-  카드는 정확히 1080px 이라 브라우저 확대 100% 에서 카드 영역만 잡으면 된다
+- **PNG 는 스크립트로 뽑는다** — 화면 캡처는 흐리다.
+  ```
+  cd C:/Dev/<앱> && node docs/marketing/export-cards.mjs     → docs/marketing/cards/instagram-<앱>-01.png … (2160×2160)
+  ```
+  로컬 Chrome(없으면 Edge)을 headless 로 띄워 카드 요소를 2배 해상도로 찍는다. `playwright-core` 는 `klead` 저장소에
+  설치된 것을 빌려 쓴다(브라우저를 내려받지 않는다). `SCALE=3` 으로 3240px 도 된다.
+  `cards/` 는 `.gitignore` — 언제든 다시 만들 수 있으니 저장소에 두지 않는다.
+  스크립트 원본은 `fitlog/docs/marketing/export-cards.mjs`. 다른 앱은 복사해서 파일명만 바꾼다
 - 커밋은 운영자 판단. 게시 후 저장소에 남겨 두면 다음 앱의 본보기가 된다
 
 ## 카드를 만드는 규칙
