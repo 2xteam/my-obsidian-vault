@@ -97,6 +97,7 @@ pnpm ingest           정규화 결과 출력 (dry-run) · -- --write 로 적재
 pnpm images:migrate   Notion 이미지 → R2 (dry-run) · -- --write
 pnpm warm             추천 질문 답변 사전 생성 (dry-run) · -- --write --lang=ko
 pnpm icons            avatar.png → 파비콘·애플 아이콘·OG
+pnpm shots:upload     실환경 캡쳐 → R2 (dir prefix 인자 2개)
 ```
 
 전체 재수집은 `fetch:notion` → `fetch:resume` → `ingest -- --write` →
@@ -108,7 +109,7 @@ pnpm icons            avatar.png → 파비콘·애플 아이콘·OG
 
 | 컬렉션 | 현재 | 무엇이 있나 |
 |---|---|---|
-| `portfolio` | **101건** | 수집한 콘텐츠. `kind` 로 구분 |
+| `portfolio` | **102건** | 수집한 콘텐츠. `kind` 로 구분 |
 | `settings` | **12건** | key-value. 재배포 없이 한도·모델·킬스위치를 바꾼다 |
 | `readers` | **1건** | `2xteam` (role=admin · 무기한 · dailyCap 500) |
 | `readers_history` | 26 | 질문 이력 **겸 카운터**. TTL 90일 |
@@ -117,10 +118,10 @@ pnpm icons            avatar.png → 파비콘·애플 아이콘·OG
 | `answers` | **16** | 사전 생성 답변 캐시 (ko, sourceVersion 1) |
 | `usage` | 1 | 일별 집계 — 전역 캡 판정. `_id` 가 KST 날짜 |
 
-### portfolio 101건의 내역
+### portfolio 102건의 내역
 
 ```
-project 45 · skill 34 · activity 8 · essay 4 · experience 4 ·
+project 46 · skill 34 · activity 8 · essay 4 · experience 4 ·
 certificate 3 · education 2 · profile 1
 ```
 
@@ -158,10 +159,25 @@ certificate 3 · education 2 · profile 1
 `.env.local` 의 `RESUME_DOCX` 로 바꿀 수 있다. 사본이
 `tmp-ingest/resume.docx` 에도 있다 — 원본이 사라져 막힌 일을 겪었다.
 
+### Notion 에 없는 프로젝트는 손으로 등록한다
+
+Notion 포트폴리오 DB 에 없는 프로젝트는 `content/projects-manual.json` 에
+적는다. `ingest` 가 `source.type: 'manual'` 로 적재하므로 **Notion 재수집이
+이 항목을 덮지 않는다.** FitLog 이 첫 사례다 — 2026-09 에 시작해서 Notion
+DB 에 항목이 없고, 그래서 재수집마다 사라질 자리였다.
+
+넣은 뒤에는 프로젝트 `order` 를 `period.start` 내림차순으로 **전체** 다시
+매긴다. 손등록 항목만 뒤에 붙이면 가장 최신 프로젝트가 목록 끝으로 간다.
+
+리포트도 `order` 로 정렬한다. 삽입 순서로 찍으면 손등록 항목이 맨 끝에
+보여서 "안 들어갔나" 하고 오해한다 — 실제로 한 번 그랬다.
+
 ### 이미지
 
-R2 버킷 `jangmini` 에 **오브젝트 77개 · 40.4MB**.
-키는 `projects/<slug>/<n>-<hash>.<ext>` (프로필은 `profile/profile/...`).
+R2 버킷 `jangmini` 에 **오브젝트 82개 · 약 42MB**.
+Notion 에서 온 것은 `projects/<slug>/<n>-<hash>.<ext>` (프로필은
+`profile/profile/...`), 손으로 찍은 캡쳐는 `projects/<slug>/<파일명>-<hash>.<ext>`
+— 어느 화면인지 URL 로 알 수 있게 파일명을 남긴다.
 공개 URL 은 `https://pub-b6ba1f5f07ef4f8c9be1a32f6beccf5c.r2.dev`.
 
 `next.config.ts` 의 `remotePatterns` 에 이 호스트를 **적어 뒀다** —
@@ -173,9 +189,9 @@ R2 버킷 `jangmini` 에 **오브젝트 77개 · 40.4MB**.
 /                  랜딩 (챗 입력 + 빠른 질문 5개 + 우상단 햄버거 메뉴)
 /chat              챗 화면. `?q=<key>` 는 추천 질문(캐시 히트), `?query=<문장>` 은 자유 입력
 /admin             자체 admin. 로그인 → 비밀번호 재확인 → 콘솔 4탭
-/resume            문서형 이력서. 대표 7건. 01~05 번호 절
-/projects          45건 아카이브. ?tech= 로 필터 (태그 32종)
-/projects/[slug]   개요/역할/성과/회고 + 이미지 갤러리. 45건 정적 생성
+/resume            문서형 이력서. 대표 8건. 01~05 번호 절
+/projects          46건 아카이브. ?tech= 로 필터 (태그 32종)
+/projects/[slug]   개요/역할/성과/회고 + 이미지 갤러리. 46건 정적 생성
 /faq               추천 질문 16개 + 상단에 문서 진입점 3개
 /api/chat          POST. 로컬은 열려 있고 **운영은 CHAT_ENABLED 미설정으로 503**
 /api/reader/*      login · logout · me · stepup
@@ -380,6 +396,7 @@ JS SPA 라 **WebFetch 로 받으면 껍데기만 온다.** "비공개"로 오판
 - [x] Phase 3 — tool 6개를 DB 조회로, 페르소나 재작성
 - [x] Phase 4 — `/resume` `/projects` `/projects/[slug]` `/faq`
 - [x] 이미지 77장 R2 이관, 아바타·파비콘·OG, 햄버거 메뉴, 한글화
+- [x] FitLog 손등록 + 실환경 캡쳐 5장 (myjane 통합 로그인은 부가 작업으로)
 - [x] Phase 5 — 답변 캐시 · 방어 계층 · reader 로그인 · admin (로컬 검증 통과)
 - [ ] **Vercel 환경 변수 등록 + `CHAT_ENABLED=true` → 운영 검증**
       → [[D jangmini 구축]]

@@ -22,11 +22,13 @@ AI 챗봇형 포트폴리오 [[jangmini]] 를 0부터 배포까지. A·B·C 와 
 - 배포는 살아 있고 문서 페이지 넷이 동작한다
 - **운영 채팅은 503** — Vercel 에 `CHAT_ENABLED` 가 없다 (의도한 상태)
 - 로컬에서는 채팅이 열려 있고 검증을 전부 통과했다
+- FitLog 을 손등록으로 넣어 프로젝트가 46건이 됐다 (`content/projects-manual.json`)
+  → [[jangmini]] 의 "Notion 에 없는 프로젝트는 손으로 등록한다"
 
 ```bash
 cd C:/Dev/jangmini
-git log --oneline -1     # ee6f72c 이어야 한다
-pnpm db:check            # portfolio 101 · settings 12 · readers 1 · suggestions 16 · answers 16
+git log --oneline -1     # 5096f67 이어야 한다
+pnpm db:check            # portfolio 102 · settings 12 · readers 1 · suggestions 16 · answers 16
 pnpm r2:check            # 권한 3단 + 공개 URL 대조
 pnpm dev                 # 3006
 ```
@@ -102,6 +104,9 @@ L4 는 우리 코드에 버그가 있어도 작동하는 유일한 층이다.
       `pnpm warm -- --write --lang=en` 을 돌린다
 - [ ] `/stack` 기술 스택 연대기 전용 페이지 (지금은 `/resume` 04 절에 표로 있다)
 - [ ] `public/resume.pdf` 다운로드 버튼
+- [ ] FitLog 갤러리에 **로그인 뒤 화면 2장**을 더한다 — 체성분 레이더/상세,
+      myjane 앱 전환 메뉴. 지금 5장은 전부 로그인 전 화면이다.
+      캡쳐는 사용자가 직접 저장해 줘야 한다 (아래 "검증에서 배운 것")
 - [ ] 슬러그 손질 — 대표 7건은 다듬었고 나머지 38건은 로마자 자동 생성이다
       (`pnpm ingest -- --write --reslug`)
 - [ ] `contribution` 이 빈 11건 (2018~2022 큐텐). 노션에서 채우면 반영된다
