@@ -163,7 +163,14 @@ DB 이름은 URI 경로가 아니라 **코드에서 `dbName: "fit"`으로 못 �
 - [x] **`.env.example` 에 `SESSION_SECRET` 추가** (2026-09-09) — myjane · SnapWord · SnapNote · fitlog
 - [x] **설정 누락이 빈 500 으로 나오지 않게** (2026-09-09) — 다섯 앱 `requireViewer` 가
       `SESSION_SECRET` 누락을 이유가 담긴 **503** 으로 돌려준다
-- [x] **SnapWord 의 `SESSION_SECRET`** — 2026-09-09 사용자가 세 배포(SnapWord · SnapNote · fitlog)에 넣었다
+- [x] **SnapWord 의 `SESSION_SECRET`** — 2026-09-09 사용자가 세 배포(SnapWord · SnapNote · fitlog)에 넣었다.
+      운영에서 확인도 했다 — `/api/me` 가 200 이고 그 경로가 `requireViewer` →
+      `verifySessionToken` → `getSecret()` 을 탄다. **Vercel 링크가 없어 `env ls` 를
+      못 쓰는 프로젝트는 라우트를 찔러 확인하면 된다**
+- [ ] **동의가 아직 두 화면이다.** 위 "이어 받기" 는 앱으로 되돌아오는 왕복을
+      없앴을 뿐, 사람은 여전히 동의 화면을 **두 번** 본다
+      (`consentGate` 가 `valid[0]` 만 보내고 나머지를 `then=` 으로 넘긴다).
+      요청은 "필요한 승인을 한 번에" 였다 → [[C 법적 페이지]] 의 한 화면 안
 
 ### ⚠️ 레이더가 사라지는 경우 (2026-09-09 사용자 보고 · 고침)
 
