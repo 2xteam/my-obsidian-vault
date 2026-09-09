@@ -3,7 +3,7 @@ title: E 개인정보 보호 보강
 type: plan
 tags: [plan, privacy, auth, security]
 updated: 2026-09-09
-status: 0~10 구현 완료 (2026-09-09) — 커밋·배포 진행 · 법률 검토와 운영 확인만 남음
+status: 배포됨 (2026-09-09) — 법률 검토 · 메일 실수신 · 크론 운영 확인 · B7 남음
 applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 ---
 
@@ -343,6 +343,18 @@ SnapNote 토큰 없음 401 · upload-image 무인증 401
 (`myjane 30dd4c7 · SnapWord 250fece · SnapNote 9de7f31 · fitlog 6f78fdd · 2hbk 849c620 · typelog 323de15`).
 운영 DB 에는 `scripts/ensure-ttl.mjs --apply` 로 TTL 인덱스 9개를 만들었다(`createdAt_1` 두 개는 지우고).
 운영 확인 결과는 아래 "배포 확인" 에 적는다.
+
+### 배포 확인 (2026-09-09, 운영 · 여섯 사이트 새 빌드 확인 뒤)
+
+```
+무인증 요청 전부 401   fitlog measurements(?userId= 포함) · snapword folders?phone= · words · snapnote wrong-notes · upload-image · 2hbk·typelog /api/me
+포털 logout            Set-Cookie 로 snap_session 을 지운다 (HttpOnly · Domain=.myjane.co.kr 확인)
+로그인 시도 제한        없는 계정으로 6번째 → 429
+/legal/privacy         보호책임자 장민 · AI 요청 기록 90일 렌더됨
+```
+
+브라우저에서의 앱 간 로그인 유지 · devtools 쿠키 확인 · 이메일 전용 계정의 SnapWord 폴더 생성(A9)은
+**사용자가 직접** 한 번 봐야 한다 — 서버 응답으로는 확인이 끝나지 않는 항목이다.
 
 ### 배포 전에 해야 하는 것 (사용자)
 
