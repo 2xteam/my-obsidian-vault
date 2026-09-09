@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/myjane
 local: C:\Dev\myjane
 branch: main
 tags: [project, myjane]
-updated: 2026-09-07
+updated: 2026-09-09
 ---
 
 # MyJane
@@ -104,7 +104,7 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 - [ ] 토큰 사용 로그(`token_logs`) — 어느 앱의 어느 기능에서 썼는지
 - [ ] 각 앱에 남은 회원가입·PIN 재설정 화면 정리
 - [x] 2hbk 이메일 로그인 경로 · 세션 서명 토큰 (2026-09-03) → [[2hbk]]
-- [ ] 세션 쿠키를 HttpOnly 서버 쿠키로 전환 검토 (현재는 클라이언트가 읽는 쿠키)
+- [x] 세션 쿠키를 HttpOnly 서버 쿠키로 전환 (2026-09-09) — `snap_session` · `snap_auth` · 표시용 `snap_user` → [[인증과 세션 공유]] · [[E 개인정보 보호 보강]]
 - [x] FitLog 카드 추가 · 카테고리 구조로 랜딩 재구성 (2026-09-02)
 
 ## 팔레트 원본이 여기 있다

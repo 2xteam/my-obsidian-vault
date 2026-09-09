@@ -3,7 +3,7 @@ title: E 개인정보 보호 보강
 type: plan
 tags: [plan, privacy, auth, security]
 updated: 2026-09-09
-status: 계획 — 심각도 순 실행 순서 확정 (2026-09-09) · 착수 전
+status: 0~10 구현 완료 (2026-09-09) — 커밋·배포 진행 · 법률 검토와 운영 확인만 남음
 applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 ---
 
@@ -307,6 +307,58 @@ TTL 인덱스 expiresAt        15분
 사용자가 정할 것 — **보관 기간 숫자(8) · 보호책임자 성명(10) · 백업 삭제(9-B5)**.
 나머지는 바로 착수할 수 있다.
 
+## 진행 결과 — 2026-09-09 (한 세션에서 0~7 까지)
+
+여섯 저장소 모두 **커밋하지 않았다.** 타입 검사(`npx tsc --noEmit`)는 여섯 곳 전부 통과했다
+(`.next*/types` 의 낡은 생성 파일 오류만 남는데, C 작업에서 지운 페이지를 가리키는 것이라 무시).
+
+| 단계 | 결과 |
+|---|---|
+| 0 | 세 앱에 `lib/auth.ts`(2hbk 복제 · `findById(claims.uid)` · `viewer.uid`) · `lib/sessionToken.ts` · `useSession` `unusable` 상태 · `hasUsableSession()` · AuthGate `relogin`. 포털 `lib/apps.ts` 세 앱에 `requiresSessionToken`. 로컬 `.env.local` 세 곳에 `SESSION_SECRET` |
+| 1 | SnapWord 24 · SnapNote 18 라우트가 `viewer.uid` 만 쓴다. 필터는 **이미 있던 `createdBy`**. `phone` 은 스키마에서 `required → default ""` (Folder · VocabularyDeck · WrongNote · Inquiry · Event) — 이메일 전용 회원이 저장할 수 있게. `words` GET · `test-sessions/[id]` · `ai-cache` · `analyze-text` · `upload-image` 처럼 **인증이 아예 없던** 라우트도 잡혔다 |
+| 2 | fitlog 26 라우트. `blood/[id]` 선택 분기 제거, PATCH 도 `findOneAndUpdate({_id, userId})`. 프로필 게이트가 `viewer.doc` 로 항상 동작 |
+| 3 | `requireConsents(viewer.uid, …)`. fitlog 채팅 `messages`·`stream` 에 `["health","overseas"]`, `suggestions` 는 `["health"]`(OpenAI 안 부름). Snap 채팅·`analyze-text`·`openai-vision` 에 `["overseas"]`. `FloatingChat` 이 412 를 받으면 동의 화면으로 |
+| 4 | 포털 `lib/loginThrottle.ts` + `models/LoginAttempt.ts`(`user` DB `login_attempts`, TTL 15분). 식별자 5회 · IP 30회. **실측: 6번째 401 → 429** |
+| 5 | 서버 쿠키 셋 — `snap_session`(HttpOnly · 토큰만) · `snap_auth`("1" 표지) · `snap_user`(표시용 — 전화번호·이메일·토큰 제거, `hasEmail` 추가). `users.sessionVersion` + 토큰 `sv`. 비밀번호·PIN 변경 · 탈퇴 확정 · `POST /api/auth/logout {all:true}` 에서 +1. 여섯 저장소에 `lib/sessionCookie.ts` · `/api/auth/logout`, 다섯 앱에 `/api/me`. 옛 `snap_user.token` 은 이행기 동안 읽는다 |
+| 6 | SnapNote 키 `snapnote/{회원 _id}/{noteId}/{uuid}.{ext}`. `scripts/migrate-r2-keys.mjs` 로 **기존 6건 이관 완료(실패 0)**, 재확인 0건. 백업 JSON 은 지웠다(옛 URL 에 전화번호). `purgeR2.deleteR2ByPrefix` 로 고아 파일까지 |
+| 7 | 세 앱 `lib/purgeOpenAiConversations.ts` — 폐기 때 `conversations.delete` 를 먼저 부른다. 404 는 지워진 것으로. **실제 삭제 호출은 확인하지 못했다**(테스트 대화 없음) |
+| 9 | B4 2hbk 키 `profiles/{userId}/…` · `goals/{userId}/…` + `deleteByOwner()`. B6 [[MongoDB Atlas]] 에 절 추가(실행은 사용자). B7 `inquiries`·`events` 의 `phone` 선택화 — 스냅샷 제거는 아직 |
+| 법적 | 쿠키 안내 표 3행으로, 방침 7항에 서버 검증·HttpOnly·시도 제한·동의 확인 추가. **`POLICY_VERSION` 은 올리지 않았다**(사용자 판단) |
+
+### 실측 (검증 서버 3010~3015 · 실제 회원 2명의 토큰을 로컬에서 서명)
+
+```
+fitlog   토큰 없음 401 · 정상 200 · 옛 snap_user 형식 200 · sv 불일치 401 · 서명 변조 401
+         남의 id 로 blood/[id] 404 · ?userId=남 → 내 것만(두 계정 모두 기록 0건이라 약한 검증)
+         /api/me 200 · chat/suggestions 412(동의 없음) · logout 이 snap_session 을 지운다
+SnapWord 토큰 없음 401 · ?phone=엉터리 200(무시됨) · 남의 vocabId 로 words 404 · analyze-text 무인증 401
+SnapNote 토큰 없음 401 · upload-image 무인증 401
+포털     email-prompt 401/200/401(sv) · 로그인 6번째 429 · logout 이 snap_session 을 지운다
+2hbk·typelog  /api/me 401/200/401(sv) · typelog 는 ADMIN 시크릿 Bearer 가 있어도 쿠키로 200
+```
+
+### 배포 전에 해야 하는 것 (사용자)
+
+- [ ] Vercel **SnapWord · SnapNote · fitlog** 에 `SESSION_SECRET` (포털과 같은 값) → 없으면 세 앱 API 전부 500/401
+- [ ] **여섯 배포를 같은 날.** 포털만 먼저 올리면 앱들이 새 쿠키를 못 읽는다(옛 세션은 이행기라 살아 있음)
+- [ ] 배포 뒤 브라우저에서: devtools `document.cookie` 에 `snap_session` 이 **없고** `snap_user` 에 전화번호·이메일이 없음 · 다섯 앱 오가며 로그인 유지 · 로그아웃 뒤 API 401
+- [ ] 이메일만으로 가입한 계정으로 SnapWord 폴더 생성 (A9 확인)
+- [ ] 2hbk R2 옛 키(`profiles/{uuid}`) 이관은 하지 않았다 — 파일이 8+3건이라 `check:images` 로 정리하는 편이 낫다
+
+### 남은 것
+
+- [x] **8 · TTL** (2026-09-09, 사용자 확정) — `openai_request_logs` **90일** · `applicants` **1년** ·
+      `inquiries` 답변 후 **1년**(부분 인덱스, 대기 중은 남김) · `login_attempts` 15분.
+      스키마에 선언 + `myjane/scripts/ensure-ttl.mjs` 로 운영 DB 에 만들었다(옛 `createdAt_1` 은 키가
+      겹쳐 지우고 만들었다). 방침 5항에 숫자를 적었다
+- [x] **9-B5** `2hbk/scripts/backup/2026-09-03…/` 삭제 (2026-09-09). 원본 `hamhibokka.users` 컬렉션은 2026-12 정리 대상
+- [ ] **9-B7** `inquiries` 의 `name`·`phone` 스냅샷을 없애고 admin 이 회원을 조회해 표시 (지금은 `phone` 만 비운다)
+- [x] **10 일부** (2026-09-09) — 보호책임자·운영자 **장민** · `POLICY_VERSION 2026-09-09` ·
+      개정 안내 띠 `components/PolicyPrompt.tsx` + `/api/auth/policy-prompt` (확인하면 `agreedPolicyVersion` 갱신, 로그인은 안 막음)
+- [ ] **10 나머지** — 실제 메일 수신(인증·탈퇴·재설정) · 크론 폐기 운영 확인 · **법률 검토 → 초안 알림 제거**
+- [ ] 이행기가 끝나면(30일 뒤) `readSessionTokenFromRequest` 의 옛 `snap_user.token` 갈래와 `saveSession` 의 토큰 물려주기를 지운다
+- [ ] `SessionUser.phone` 필드 자체를 없앤다 — 지금은 호환을 위해 `""` 로 채운다. Snap 화면의 `?phone=` 쿼리 정리와 함께
+
 ## 볼트 기록과 다른 것 — 고쳐야 한다
 
 | 노트 | 적힌 것 | 실제 |
@@ -315,7 +367,7 @@ TTL 인덱스 expiresAt        15분
 | [[C 법적 페이지]] "분리 동의 셋" 표 | 국외 이전 동의 없으면 **AI 대화**도 막힌다 | fitlog 채팅 라우트에 게이트 없음 (A5) |
 | [[인증과 세션 공유]] "남은 과제" | Snap 계열과 FitLog 가 클라이언트 `userId` 를 믿는다 | 맞다. 다만 Snap 은 `userId` 가 아니라 **`phone`** 이 키다 — 마이그레이션이 필요한 이유 (A1) |
 
-2026-09-09 에 세 노트에 이 계획서를 가리키는 한 줄씩을 넣었다. 본문은 1단계가 끝나면 고친다.
+2026-09-09 에 세 노트에 이 계획서를 가리키는 한 줄씩을 넣었고, 같은 날 구현이 끝나 셋 다 **지금은 사실**이 됐다(위 진행 결과).
 
 ## 겹치는 부분
 
