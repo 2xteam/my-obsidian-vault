@@ -54,6 +54,15 @@ applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 - 자녀 프로필은 이메일이 없어 앱 `EmailBanner` 가 뜨지 않게 세션에 `child: true`
 - 자녀 세션에서 포털 계정 API 를 부르면 403 `{ child: true }` — 동의 화면은 "보호자 프로필에서" 안내
 
+### 배포 확인 (2026-09-09 운영 · myjane 4435fad · SnapWord b4277af · SnapNote 4b4b6a0 · fitlog 08393ff · 2hbk 063da4b · typelog ea6f2e7)
+
+```
+/account/children · /account/switch   200
+/api/auth/switch · /api/account/children 무인증 401 · pick-profile 엉터리 토큰 401
+2hbk /api/admin/family-follow 무인증 403 · 방침 6항 "자녀 프로필" 렌더 · 법적 페이지 헤더-탭 여백
+```
+아래 항목은 실제 계정으로 사람이 한 번 봐야 한다.
+
 ### 운영에서 확인할 것
 
 - [ ] 자녀 추가 → 로그인 시 프로필 선택 → 자녀로 SnapWord 폴더 생성 → 보호자 프로필에는 안 보임
