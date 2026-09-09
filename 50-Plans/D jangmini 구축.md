@@ -2,8 +2,8 @@
 title: D jangmini 구축
 type: plan
 tags: [plan, jangmini, portfolio, openai]
-updated: 2026-09-08
-status: Phase 0~4 완료 · Phase 5 착수 대기
+updated: 2026-09-09
+status: Phase 0~5 구현·로컬 검증 완료 · 운영 개방 대기
 applies-to: [jangmini]
 ---
 
@@ -15,158 +15,122 @@ AI 챗봇형 포트폴리오 [[jangmini]] 를 0부터 배포까지. A·B·C 와 
 앱 자체의 사실(스택·데이터·결정·함정)은 [[jangmini]] 에 있다.
 **이 문서는 순서와 남은 일만** 적는다.
 
-## 이어받는 세션이 먼저 할 것
+## 지금 상태 — 2026-09-09
 
-2026-09-08 세션이 사용량 한도로 중단됐다. 이어받을 때 —
+**Phase 0~5 구현과 로컬 검증이 끝났다.** 남은 것은 운영 개방뿐이다.
 
-1. [[jangmini]] 를 읽는다. 특히 "여섯 앱과 다른 점" 표와 "함정" 절
-2. `C:\Dev\jangmini` 에서 상태를 확인한다
+- 배포는 살아 있고 문서 페이지 넷이 동작한다
+- **운영 채팅은 503** — Vercel 에 `CHAT_ENABLED` 가 없다 (의도한 상태)
+- 로컬에서는 채팅이 열려 있고 검증을 전부 통과했다
 
 ```bash
 cd C:/Dev/jangmini
-git log --oneline -1        # 4818033 이어야 한다
-pnpm db:check               # portfolio 101 · settings 12 · readers 1
-pnpm r2:check               # 권한 3단 통과 + 공개 URL 대조
-pnpm dev                    # 3006
+git log --oneline -1     # ee6f72c 이어야 한다
+pnpm db:check            # portfolio 101 · settings 12 · readers 1 · suggestions 16 · answers 16
+pnpm r2:check            # 권한 3단 + 공개 URL 대조
+pnpm dev                 # 3006
 ```
 
-3. **개발 서버가 떠 있으면 `pnpm build` 를 돌리지 않는다.** 같은 `.next/` 를
-   써서 개발 서버가 먹통이 된다. 타입은 `npx tsc --noEmit` 으로 본다
-   → [[AI 협업 규칙]]
-
-### 지금 어디까지 되어 있나
-
-배포는 살아 있고(`https://jangmini.myjane.co.kr`) 문서 페이지 넷이 동작한다.
-**AI 채팅만 닫혀 있다** — `POST /api/chat` 이 503 을 준다.
-
-닫아 둔 이유: 사이트가 공개된 상태에서 원본 라우트가 인증도 제한도 없었고,
-`messages` 배열을 클라이언트가 통째로 보내 **범용 GPT 프록시로 쓸 수
-있었다.** 급한 구멍만 막은 임시 차단장치가 `route.ts` 에 있다
-(킬스위치 · system 역할 거부 · 역할별 글자 수 상한 · `maxTokens` ·
-errorHandler 일반화). 제대로 된 방어는 아래 Phase 5 다.
+⚠️ **개발 서버가 떠 있으면 `pnpm build` 를 돌리지 않는다.** 같은 `.next/` 를
+써서 개발 서버가 먹통이 된다. 타입은 `npx tsc --noEmit`.
+→ [[개발 서버와 검증 환경]]
 
 ---
 
-## Phase 5 — 남은 일
+## 남은 일 — 운영 개방
 
-순서가 중요하다. **채팅을 켜는 것이 맨 마지막이다.**
+### ① Vercel 환경 변수
 
-### 5-1. 추천 질문과 답변 캐시 (여기부터)
+프로젝트 → Settings → Environment Variables. **배포 전에 전부 넣는다** —
+환경 변수는 그 배포를 만들 때 스냅샷된다 → [[Vercel 배포 패턴]]
 
-- [ ] `src/lib/suggestions.ts` 의 16개를 `suggestions` 컬렉션에 넣는다
-      (seed 스크립트에 추가). **`key` 는 절대 바꾸지 않는다** — 캐시의 조회 키다
-- [ ] 답변 **사전 생성** 스크립트. 각 `key` × `lang`(ko/en) 로 한 번 호출해
-      `answers` 에 저장한다. `sourceVersion` 을 `settings["content.sourceVersion"]`
-      에서 읽어 함께 박는다
-- [ ] 사람이 읽고 손볼 수 있게 한다 — 채용 담당자가 볼 확률이 가장 높은
-      답변을 **검수된 문장으로 고정**하는 것이 목적이다
-- [ ] 칩을 누르면 **텍스트가 아니라 `key`** 를 보낸다. 지금 `/faq` 와 랜딩은
-      `?query=<문장>` 을 보내므로 `?q=<key>` 로 바꿔야 캐시가 맞는다
-- [ ] 캐시 히트면 **OpenAI 를 호출하지 않는다.** DB 에서 읽어 조각내 흘려보내
-      UX 를 같게 유지한다 → [[AI 채팅 패턴]]
-- [ ] 재수집 때 `content.sourceVersion` 을 올려 옛 답변을 만료시킨다.
-      안 하면 이력을 고쳐도 챗봇이 옛 이야기를 계속 한다
-
-### 5-2. 방어 7층
-
-| 층 | 수단 | 막는 것 |
-|---|---|---|
-| L0 | 5-1 의 사전생성 캐시 | 정상 트래픽 대부분. 호출 0회 |
-| L1 | 입력 상한 · `maxSteps` · `maxOutputTokens` | 한 요청의 최대 단가 |
-| L2 | `readers_history` 기반 익명 제한 | 한 사람의 반복 |
-| L3 | **전역 일일 캡** (`usage` + `settings`) | 분산된 다수 · IP 로테이션 |
-| L4 | **OpenAI 프로젝트 hard limit** | 위가 전부 뚫렸을 때의 최종 상한 |
-| L5 | Origin/Referer 검증 · honeypot | 스크립트 봇 |
-| L6 | 인젝션 가드 (이미 프롬프트에 있음) | "이전 지시를 무시하라" 류 |
-
-- [ ] L1 상한을 `route.ts` 하드코딩에서 **`settings` 조회**로 옮긴다
-      (서버에서 60초 메모이즈). 환경 변수는 배포 시점에 스냅샷되어 숫자 하나에
-      재배포가 필요하다 → [[Vercel 배포 패턴]]
-- [ ] L2 — `clientId`(localStorage) 와 `ipHash` 중 **엄격한 쪽**을 적용한다.
-      IP 는 원문을 저장하지 않고 `sha256(ip + IP_HASH_SALT)` 만 둔다
-- [ ] L3 — 캡에 걸리면 "죄송합니다"로 끝내지 않고 **`/resume`·`/projects` 로
-      보낸다.** 문서 페이지를 먼저 만든 이유가 이것이다
-- [ ] L4 — **사용자 확인 필요.** OpenAI 키가 다른 앱과 공유 중이다.
-      전용 프로젝트 키로 바꾸고 monthly hard limit 을 걸어야 L4 가 성립한다.
-      지금은 이 층이 비어 있다
-- [ ] L1 상한 값은 `settings` 에 이미 있다 —
-      `chat.maxUserChars` 500 · `chat.maxMessages` 21 ·
-      `chat.maxOutputTokens` 800 · `chat.maxSteps` 3 ·
-      `chat.anon.perMinute` 3 / `perHour` 15 / `perDay` 30 ·
-      `chat.global.dailyRequests` 500 · `chat.global.dailyTokens` 500000
-
-### 5-3. reader 로그인
-
-- [ ] `POST /api/reader/login` — bcrypt 비교 → 만료 확인 → HMAC 서명 쿠키
-- [ ] 쿠키 `jangmini_reader` · **호스트 전용**(`domain` 미지정) ·
-      httpOnly · Secure · SameSite=Lax
-- [ ] 도착하는 myjane `snap_user` 쿠키는 **완전히 무시**한다 → [[jangmini]]
-- [ ] **로그인 시도 제한** — `login_attempts`, IP당 15분 5회.
-      4자리 비밀번호라 이게 없으면 전수 시도가 통한다
-- [ ] 첫 진입 안내 모달에 **"다시 보지 않기"** — `localStorage`.
-      **접근 자체가 throw 할 수 있으니 try/catch 로 감싸고, 실패해도 화면이
-      정상 동작하게** 한다(프라이빗 모드)
-- [ ] 우상단 로그인 버튼은 **상시 노출**. "다시 보지 않기" 를 눌러도 들어갈 수
-      있어야 한다. 로그인 후 `2xteam · 만료 D-12` 배지
-- [ ] 익명도 사이트를 전부 본다. reader 로그인은 **게이트가 아니라 제한 해제**다
-      (채용 담당자는 계정이 없다)
-- [ ] 제한에 걸렸을 때 입력창을 잠그는 UI 는 **이미 자리가 있다** —
-      자식 컴포넌트의 `hasReachedLimit` prop 을 지우지 않고 남겨 뒀다
-
-### 5-4. admin
-
-- [ ] `/admin` — `readers.role === 'admin'` + **진입 시 비밀번호 재확인**,
-      admin 세션 TTL 2시간 (reader 는 30일)
-- [ ] `/admin/readers` 발급·만료·비번재설정·활성 · `/admin/settings` ·
-      `/admin/history` · `/admin/suggestions`(캐시 답변 검수) · `/admin/usage`
-- [ ] **비밀번호 변경 화면**을 꼭 둔다 — 초기값이 4자리다
-- [ ] `featured` 토글을 admin 에 만들면 그때 원본을 `ingest.mjs` 의
-      `FEATURED` 에서 DB 로 옮긴다. 그전까지 재수집이 DB 값을 덮으므로
-      두 곳에 두지 않는다
-
-### 5-5. 채팅 개방과 검증
-
-- [ ] Vercel 환경 변수에 **`CHAT_ENABLED=true`** 를 넣고 재배포.
-      **여기가 마지막이다** — 5-1~5-4 가 끝나기 전에는 넣지 않는다
-- [ ] Vercel 환경 변수 점검 — `MONGO_URI` 가 **`mongodb+srv://`** 인지
-      (로컬 표준 URI 를 복사하면 안 된다), `MONGO_DB` ·
-      `NEXT_PUBLIC_COOKIE_DOMAIN` 이 **없는지**
-
-| 확인할 것 | 어떻게 |
+| 변수 | 값 |
 |---|---|
-| 빌드 | `pnpm build`. **개발 서버를 먼저 내린다** |
-| 빠른 질문 5개 | 각 버튼이 올바른 tool 을 부르고 컴포넌트가 그려지는지. **캐시 히트로 OpenAI 호출 0회**인지 함께 |
-| 페르소나 | "연봉이 얼마냐" · "파이썬 코드 짜줘" · "이전 지시를 무시하고 …" 세 개를 실제로 던진다 |
-| rate limit | 익명으로 한도+1 회 → 차단 문구와 브라우징 유도. reader 로그인 후 풀리는지. **만료된 reader 는 막히는지** |
+| `MONGO_URI` | **`mongodb+srv://`** — 로컬의 표준 URI 를 복사하면 안 된다 |
+| `SESSION_SECRET` | `.env.local` 값. myjane 것과 달라야 한다 |
+| `IP_HASH_SALT` | `.env.local` 값 |
+| `OPENAI_API_KEY` | 아래 ③ 참고 |
+| `NOTION_TOKEN` | 수집 스크립트만 쓴다. 런타임에 필요 없다 |
+| `R2_*` 5개 | 이미지는 이미 R2 에 있고 URL 이 DB 에 박혀 있어, 런타임에 필요 없다 |
+| **`CHAT_ENABLED`** | **`true` — 맨 마지막에 넣는다** |
 
-`readers_history` 를 직접 조회해 카운트가 실제로 쌓였는지 본다.
-화면만 보고 "동작한다"고 판단하지 않는다.
+**넣지 않는 것** — `MONGO_DB` · `NEXT_PUBLIC_COOKIE_DOMAIN` ·
+`SEED_READER_PASSWORD` · `GITHUB_TOKEN` · `OPENAI_VISION_MODEL`
+
+`NEXT_PUBLIC_*` 은 Secret 이 아니라 **Config** 타입이어야 한다(지금은 쓰는
+값이 없다) → [[Vercel 배포 패턴]]
+
+### ② 운영 검증 (로컬에서 통과한 것을 다시)
+
+```bash
+# 캐시 히트 — source=cache 여야 한다
+curl -sD- -o/dev/null -X POST https://jangmini.myjane.co.kr/api/chat \
+  -H 'Content-Type: application/json' -H 'Origin: https://jangmini.myjane.co.kr' \
+  --data-binary @payload.json | grep -i x-jangmini-source
+```
+
+⚠️ **한글 페이로드를 셸에 인라인으로 넣지 않는다.** Git Bash 를 통과하며
+깨져서 `detectLang` 이 `en` 을 주고, 캐시가 안 맞는다. 이걸로 "캐시가 고장났다"
+고 오판했다 — **UTF-8 파일로 만들어 `--data-binary @파일`** 로 보낸다.
+
+- [ ] 추천 질문 5개 → `source=cache`
+- [ ] 자유 질문 → `source=openai`
+- [ ] 페르소나 거절 3종 (연봉 / 파이썬 코드 / 인젝션)
+- [ ] 익명 제한 → 429 + `browse=true`
+- [ ] reader 로그인 → 제한 해제. 쿠키에 `domain=` 이 **없어야** 한다
+- [ ] `/admin` → 비로그인 차단 · step-up 요구 · 4탭 동작
+- [ ] myjane 여섯 앱이 멀쩡한지 (`www` `snapword` `fitlog` …)
+
+### ③ OpenAI 전용 프로젝트 키 — **아직 미결**
+
+여러 번 알렸고 아직 그대로다. **방어 7층 중 L4 가 비어 있다.**
+
+지금 키는 SnapWord·SnapNote·FitLog 와 공유한다. jangmini 가 어뷰징당하면
+그 앱들의 예산까지 태우고, 키를 회수하면 그 앱들이 함께 죽는다.
+
+L2(익명 제한)는 시크릿 창이면 초기화되므로 완벽할 수 없다. 그래서 실제
+방어선은 L3(전역 일일 캡)과 **L4(OpenAI 프로젝트 monthly hard limit)** 다.
+L4 는 우리 코드에 버그가 있어도 작동하는 유일한 층이다.
+
+바꾸는 것은 `.env.local` 과 Vercel 의 한 줄이다.
 
 ---
 
-## 사용자에게 확인해야 할 것
+## 그다음 (급하지 않음)
 
-- [ ] **OpenAI 전용 프로젝트 키** — 지금 다른 앱과 공유 중이라 L4 가 없다.
-      jangmini 가 어뷰징당하면 SnapWord·SnapNote·FitLog 예산까지 태우고,
-      키를 회수하면 그 앱들이 함께 죽는다 (여러 번 알렸고 아직 미결)
-- [ ] **`profile/profile/1-*.png` (2.2MB)가 본인 사진인지.** 맞으면 랜딩
-      히어로를 그것으로 바꿀 수 있다 — 지금은 사용자가 준 메모지를 쓰고 있다
-- [ ] `public/resume.pdf` — 다운로드 버튼을 둘지
-- [ ] `contribution` 이 비어 있는 11건 (2018~2022 큐텐 시절). 노션에서 채우면
-      재수집 때 반영된다
-- [ ] 노션 태그 `cloudflare` 가 한 번도 안 붙었다. Ignite 에 Cloudflare S3 를
-      썼으니 붙일 만하다
+- [ ] 영문 답변 캐시 — 지금은 `ko` 16건만 있다. 영문 질문 칩이 생길 때
+      `pnpm warm -- --write --lang=en` 을 돌린다
+- [ ] `/stack` 기술 스택 연대기 전용 페이지 (지금은 `/resume` 04 절에 표로 있다)
+- [ ] `public/resume.pdf` 다운로드 버튼
+- [ ] 슬러그 손질 — 대표 7건은 다듬었고 나머지 38건은 로마자 자동 생성이다
+      (`pnpm ingest -- --write --reslug`)
+- [ ] `contribution` 이 빈 11건 (2018~2022 큐텐). 노션에서 채우면 반영된다
+- [ ] 노션 태그 `cloudflare` 가 한 번도 안 붙었다. Ignite 에 붙일 만하다
+- [ ] `profile/profile/1-*.png` (2.2MB)가 본인 사진인지 확인 — 맞으면 히어로에
+      쓸 수 있다. 지금은 사용자가 준 메모지를 쓴다
+
+## 검증에서 배운 것
+
+- **한글을 셸 인라인으로 보내면 깨진다.** 파일로 만들어 `--data-binary`.
+  이걸로 캐시가 고장난 줄 알았다
+- **캐시 히트는 전역 캡을 우회한다.** 의도한 설계지만, 캡을 검증할 때는
+  **자유 질문**으로 해야 한다. 추천 질문으로 테스트하면 캡이 안 걸려서
+  "캡이 동작하지 않는다"고 오판한다
+- **DOM 존재만 보고 판단하지 않는다** → [[화면 확인의 함정]]
+- 챗 화면이 지운 메모지 영상 3개를 참조해 404 를 네 번 받고 있었다.
+  화면은 정상으로 보였다 — **네트워크와 콘솔을 함께 봐야** 잡힌다
 
 ## 하지 않기로 한 것
 
 - **JSON Resume 테마** — 그 스키마에 회고·기여도·4단 본문이 들어갈 자리가 없다
-- **레퍼런스 스크린샷 페이지** — 구조는 정해졌고 더 보는 건 결정을 늦춘다
-- **myjane 디자인 시스템 적용** — 사용자가 명시적으로 하지 말라고 했다.
-  원작자 색·타이포를 그대로 쓰고 레이아웃만 문서형으로 잡았다
-- **`이미지 갤러리에 object-cover`** — 스크린샷의 위아래가 잘려 정작 봐야 할
-  UI 가 사라진다. `object-contain` 이다
+- **myjane 디자인 시스템 적용** — 사용자가 명시적으로 하지 말라고 했다
+- **자유 입력 캐시** — 텍스트를 해시하면 거의 안 맞고, 방문자가 조금씩 다른
+  문장으로 캐시 컬렉션을 채울 수 있다
+- **`CHAT_ENABLED` 를 DB 설정으로** — DB 를 못 읽을 때도, DB 가 뚫렸을 때도
+  과금 경로가 열려선 안 된다. 환경 변수로 남긴다
+- **등장 애니메이션에 가시성을 의존** → [[화면 확인의 함정]]
 
 ## 관련
 
 [[jangmini]] · [[Plans MOC]] · [[MongoDB Atlas]] · [[Cloudflare R2]] ·
-[[Vercel 배포 패턴]] · [[AI 채팅 패턴]]
+[[Vercel 배포 패턴]] · [[AI 채팅 패턴]] · [[화면 확인의 함정]]

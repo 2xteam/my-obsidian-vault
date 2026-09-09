@@ -8,7 +8,7 @@ local: C:\Dev\fitlog
 branch: main
 db: fit
 tags: [project, myjane]
-updated: 2026-09-07
+updated: 2026-09-09
 ---
 
 # FitLog
@@ -172,6 +172,10 @@ Blood를 만들며 같은 기준으로 견줘 보니 네 가지가 갈렸다. **
 
 반대로 인바디가 앞선 것 — 소유자 확인(GET·PATCH·DELETE 모두 `userId`로 범위를 좁힌다)과
 유도된 범위 표시(`Range.derived`를 화면에 밝힌다). Blood가 이 둘을 따라갔다.
+
+> ⚠️ **2026-09-09 재확인 — 반만 맞다.** `blood/[id]` GET 은 `userId` 가 없으면 id 만으로
+> 돌려준다(`findOne(userId ? {_id,userId} : {_id})`). 그리고 그 `userId` 자체가 클라이언트가
+> 보낸 쿼리라 소유자 확인이 아니다. 고치는 계획은 [[E 개인정보 보호 보강]] 1단계.
 
 ## 화면 구성 — Inbody 한 곳에서 본다
 

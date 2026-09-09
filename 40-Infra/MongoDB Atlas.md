@@ -2,7 +2,7 @@
 title: MongoDB Atlas
 type: infra
 tags: [infra, mongodb]
-updated: 2026-09-08
+updated: 2026-09-09
 ---
 
 # MongoDB Atlas
@@ -182,6 +182,24 @@ Vercel 은 `mongodb+srv://`** 로 나눠 둔다.
 `NEXT_PUBLIC_COOKIE_DOMAIN` 처럼 **있으면 안 되는 변수의 존재 자체를 경고**해야
 한다. 없는 것을 확인하는 절을 따로 두는 편이 낫다 — jangmini 판이 그 예다
 (`C:\Dev\jangmini\scripts\check-db.mjs`).
+
+## 보안 — `0.0.0.0/0` 을 열어 둔 대가로 해야 하는 것 (2026-09-09)
+
+Network Access 를 전체 개방했으니 **비밀번호와 권한이 유일한 담장**이다.
+[[E 개인정보 보호 보강]] 9번(B6). 사용자가 Atlas 대시보드에서 직접 한다.
+
+- [ ] **DB 사용자를 앱별로 나눈다.** 지금은 URI 하나가 클러스터 전체를 본다.
+      `myjane-app`(`user` 읽기/쓰기) · `snapword-app`(`vocab` + `user`) · `snapnote-app`(`math` + `user`) ·
+      `fitlog-app`(`fit` + `user`) · `2hbk-app`(`hamhibokka` + `user`) · `typelog-app`(`type` + `user`).
+      한 앱의 키가 새도 다른 앱 DB 는 못 본다. Vercel 의 `MONGO_URI` 를 앱마다 바꾸고 재배포
+- [ ] **비밀번호 교체 주기** — 분기마다. 교체 뒤 재배포(환경 변수는 배포 시점 스냅샷)
+- [ ] **감사 로그 · 백업 보존 기간** — M0 에는 감사 로그가 없다. 플랜을 올릴 때 다시 본다.
+      M0 의 백업(스냅샷)도 없다 — 회원 문서 백업은 `scripts/backup` 류의 수동 덤프뿐이다.
+      **수동 덤프는 검증이 끝나면 지운다** (2hbk 이관 덤프가 그 예)
+- [ ] 로컬 `.env.local` 의 URI 도 같은 권한 축소를 따른다 — 개발 PC 가 털리면 운영 DB 전체가 열린다
+
+암호화 — Atlas 는 저장 시 암호화(at rest)와 TLS 가 기본이다. 방침 7항에는 "사업자의 관리형
+저장소" 라고만 적었는데, 위 사용자 분리가 끝나면 "앱별 최소 권한 계정" 을 더 적을 수 있다.
 
 ## 서버리스 연결 설정
 

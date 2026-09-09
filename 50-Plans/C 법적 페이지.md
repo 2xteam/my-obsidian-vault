@@ -2,7 +2,7 @@
 title: C 법적 페이지
 type: plan
 tags: [plan, legal, privacy]
-updated: 2026-09-07
+updated: 2026-09-09
 status: 배포됨 (2026-09-08) — 법률 검토 대기
 applies-to: [myjane]
 ---
@@ -481,6 +481,11 @@ SnapWord 만 쓸 사람에게 건강정보 동의를 받는 것은 필요 없는
 동의하는지 알 수 없다.** 그래서 화면이 412 를 보고 동의 화면으로 데려다 놓는다.
 
 게이트를 건 자리 — `fitlog` 인바디·피검사 추출, `SnapWord`·`SnapNote` 비전.
+
+> ⚠️ **2026-09-09 재확인 — fitlog 채팅에는 게이트가 없다.** `chat/threads/[id]/messages` ·
+> `stream` 이 인바디·피검사 수치를 OpenAI 지침에 실어 보내는데 `requireConsent` 를 부르지
+> 않는다. 위 표의 "AI 대화" 칸은 아직 사실이 아니다. 또 게이트가 받는 `userId` 가
+> 클라이언트 값이라 동의한 남의 id 로 통과된다 → [[E 개인정보 보호 보강]] A4·A5
 ⚠️ SnapNote 은 UI 가 그 라우트를 부르지 않는다(업로드만 쓴다). 게이트는 방어로
 남기고 화면은 손대지 않았다.
 
