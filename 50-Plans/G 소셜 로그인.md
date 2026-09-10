@@ -145,6 +145,12 @@ myjane/app/login                          구글 버튼(브랜드 규정) · ?pi
 - 비밀번호 없는 회원이 생긴다. 로그인 라우트는 password 없는 계정을 건너뛰고, `passwordAgeDays` 는 password 없으면 null 이라 갱신 안내가 뜨지 않는다
 - 아직 없는 것: My 화면 "연결된 계정"(연결 API 는 `start?link=1` 로 준비됨) · 카카오 · 네이버
 
+### ⚠️ 함정 — `NextResponse.redirect` 는 절대 URL 만 (2026-09-10 첫 운영 시도)
+
+콜백이 세션을 내리고 `"/"` 로 보내려다 **500** 이 났다. `NextResponse.redirect("/")` 는 URL 이 아니라며 던진다.
+콜백 안의 모든 302 는 `${portalOrigin(req)}…` 로 만든다. 로컬은 `localhost:3000`, 운영은 `NEXT_PUBLIC_BASE_URL`.
+사용자가 구글 동의까지 마친 뒤 흰 화면(HTTP 500)을 봤다 — 콜백은 반드시 실패해도 `/login?oauth_error=` 로 돌아가야 한다.
+
 ### 운영자가 할 것 (배포 뒤)
 
 1. Google Cloud Console → API 및 서비스 → OAuth 동의 화면(외부 · 앱 이름 myjane · 방침 URL `https://www.myjane.co.kr/legal/privacy`) →
