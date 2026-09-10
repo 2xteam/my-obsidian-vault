@@ -3,7 +3,7 @@ title: G 소셜 로그인
 type: plan
 tags: [plan, auth, oauth]
 updated: 2026-09-10
-status: 구글 구현 완료 (2026-09-10) — 콘솔 등록·환경 변수 대기 · 카카오·네이버는 뒤에
+status: 구글 운영 확인 · 카카오 구현 완료 (2026-09-10) — 카카오 콘솔·환경 변수 대기 · 네이버는 뒤에
 applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 ---
 
@@ -145,6 +145,31 @@ myjane/app/login                          구글 버튼(브랜드 규정) · ?pi
 - 비밀번호 없는 회원이 생긴다. 로그인 라우트는 password 없는 계정을 건너뛰고, `passwordAgeDays` 는 password 없으면 null 이라 갱신 안내가 뜨지 않는다
 - 아직 없는 것: My 화면 "연결된 계정"(연결 API 는 `start?link=1` 로 준비됨) · 카카오 · 네이버
 
+## 구현 — 카카오 (2026-09-10, 구글 운영 확인 뒤)
+
+```
+myjane/lib/oauth/callback.ts              공용 콜백 — state 대조 · 교환(공급자별) · 매칭 ①②③④ · 세션 · 복귀. 구글도 이걸 쓴다
+myjane/lib/oauth/kakao.ts                 인가 URL(scope profile_nickname,account_email) · 토큰 교환 · v2/user/me
+myjane/app/api/auth/oauth/kakao/{start,callback}
+로그인 화면 카카오 버튼(#FEE500 · 검정 85% · 말풍선 · "카카오 로그인") · providers 라우트 · 방침 4항 · 쿠키 문구 · .env.example
+```
+
+- `KAKAO_CLIENT_ID` = 앱 키의 **REST API 키**. `KAKAO_CLIENT_SECRET` 은 [보안] 탭에서 Client Secret 을 "사용함" 으로 켰을 때만 — 켜지 않으면 비워 둔다(토큰 요청에 넣지 않는다)
+- 이메일은 **선택 동의**다(필수는 비즈 앱). 거부하면 email null → 동의 화면이 이메일을 입력받아 인증 메일(③).
+  `is_email_verified` 가 true 인 이메일만 검증된 것으로 보고 기존 계정 연결(②)에 쓴다
+- 구글 콜백도 공용 함수로 옮겼다 — 동작은 같다(운영에서 구글 로그인 확인 뒤 옮김)
+
+### 운영자가 할 것 — 카카오
+
+1. developers.kakao.com → 내 애플리케이션 → **애플리케이션 추가** (앱 이름 myjane · 회사명 개인)
+2. [앱 설정 → 플랫폼] Web 플랫폼 등록 — 사이트 도메인 `https://www.myjane.co.kr` · `http://localhost:3000`
+3. [제품 설정 → 카카오 로그인] **활성화 ON** · Redirect URI 둘 등록
+   `https://www.myjane.co.kr/api/auth/oauth/kakao/callback` · `http://localhost:3000/api/auth/oauth/kakao/callback`
+4. [제품 설정 → 카카오 로그인 → 동의항목] 닉네임 **필수 동의** · 카카오계정(이메일) **선택 동의**(개인 앱은 필수 불가) · 동의 목적 한 줄씩
+5. [앱 설정 → 앱 키] **REST API 키** → `KAKAO_CLIENT_ID`. [제품 설정 → 카카오 로그인 → 보안] Client Secret 을 켰다면 코드 → `KAKAO_CLIENT_SECRET`, 안 켰으면 비움
+6. [앱 설정 → 일반] 개인정보처리방침 URL `https://www.myjane.co.kr/legal/privacy` · 서비스 약관 `…/legal/terms`
+7. Vercel myjane 환경 변수 → 재배포 → 로그인 화면에 노란 버튼. 팀원 외 사용자도 되게 하려면 [비즈니스] 은 필요 없다(개인 앱도 로그인은 공개) — 단 이메일 필수 동의만 못 쓴다
+
 ### ⚠️ 함정 — `NextResponse.redirect` 는 절대 URL 만 (2026-09-10 첫 운영 시도)
 
 콜백이 세션을 내리고 `"/"` 로 보내려다 **500** 이 났다. `NextResponse.redirect("/")` 는 URL 이 아니라며 던진다.
@@ -165,7 +190,7 @@ myjane/app/login                          구글 버튼(브랜드 규정) · ?pi
 1. [ ] 콘솔 등록 · 환경 변수 (운영자) — 구글부터
 2. [x] 스키마 `providers` 여섯 앱 + 부분 유일 인덱스 (2026-09-10)
 3. [x] 구글 start → callback → 세션 (2026-09-10 구현 · 운영 확인은 환경 변수 뒤). 자녀 있는 계정 · `from=fitlog` 복귀 · state 불일치 400 · 미검증 이메일 → ③ 확인
-4. [ ] 카카오 · 네이버 추가 (프로필 API 만 다르다)
+4. [x] 카카오 추가 (2026-09-10 구현 · 콘솔 대기) · [ ] 네이버
 5. [x] 첫 가입 동의 화면 · 동의 없이 `complete` 호출 → 400 (2026-09-10)
 6. [x] 로그인 화면 구글 버튼 (2026-09-10)
 7. [x] 방침·쿠키 안내 · `POLICY_VERSION 2026-09-10`
