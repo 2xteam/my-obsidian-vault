@@ -7,7 +7,7 @@ repo: https://github.com/2xteam/myjane
 local: C:\Dev\myjane
 branch: main
 tags: [project, myjane]
-updated: 2026-09-09
+updated: 2026-09-10
 ---
 
 # MyJane
@@ -112,6 +112,18 @@ snapword.myjane.co.kr  →  www.myjane.co.kr/login?from=snapword&next=/home
 인스타그램 본문에는 링크가 걸리지 않아 프로필 링크 하나를 `www.myjane.co.kr/link` 로 둔다.
 여섯 서비스의 **소개 페이지**(로그인 전 화면)로 가는 카드 목록이고, 그때 홍보하는 서비스를 맨 위에 올린다.
 검색 색인은 막았다(`robots: noindex`) → [[SNS 소개 카드와 게시글]]
+
+## `/share` — 공유형 링크 모음 (2026-09-10)
+
+`/link` 가 서비스 소개 페이지 목록이라면, `/share` 는 **앱 안에서 만들어진 공유 링크**(예: TypeLog 결과 `/r/<token>` —
+친구가 나눈 타입을 보고 로그인 없이 바로 참여)를 운영자가 골라 나열하는 페이지다. 첫 항목은 TypeLog 러닝 성향.
+
+- 데이터는 포털 자신의 것 → `user` DB `share_links` (`models/ShareLink.ts`). 제목 · 설명 · 주소 · 서비스 · 이모지 · 순서 · 켜짐
+- **주소는 myjane 서비스 도메인의 https 만** 받는다(`shareLinkUrlProblem`) — 남의 주소를 우리 이름으로 내보내지 않는다
+- 관리는 통합 admin **`/admin/share`**(운영자·마스터) — 등록 · 수정 · 위/아래 · 끄기(숨김) · 삭제. API 는 `/api/admin/share`
+- 공개 화면은 서버 컴포넌트가 켜진 것만 읽는다(캐시 60초). 검색 색인은 막았다
+- 첫 건은 `scripts/seed-share-link.mjs` 로 넣었다. 이후는 admin 에서
+- SNS 프로필 링크는 `/link` 하나로 두고, `/link` 하단에서 `/share` 로 이어 준다 → [[SNS 소개 카드와 게시글]]
 
 ## 팔레트 원본이 여기 있다
 

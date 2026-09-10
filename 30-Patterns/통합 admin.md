@@ -2,7 +2,7 @@
 title: 통합 admin
 type: pattern
 tags: [pattern, admin, myjane]
-updated: 2026-09-04
+updated: 2026-09-10
 ---
 
 # 통합 admin
@@ -48,6 +48,11 @@ tables?: { title: string; columns: string[]; rows: (string|number)[][] }[]  // �
 
 `lib/adminApps.ts` 의 `features` 로 선언한다. 없는 탭을 그리면 404 를 부르게 되는데,
 **앱이 죽은 것과 구분이 안 된다.**
+
+## 포털 자신의 데이터를 다루는 화면
+
+회원 관리(`/admin/members`) 말고 하나 더 — **공유 링크(`/admin/share`, 2026-09-10)**. `/share` 공개 화면의 목록을
+등록·수정·정렬·숨김한다. 둘 다 `user` DB 를 직접 읽는 포털의 것이라 앱 API 를 거치지 않는다 → [[MyJane]] "/share"
 
 ## 권한
 
@@ -109,7 +114,8 @@ if (searchParams.get("pin") !== ADMIN_PIN) ...  // URL 이라 접근 로그에 �
 - 앱들이 **mkcert 자기서명 인증서**를 쓰므로 Node 가 인증서를 못 믿는다.
   이 플래그가 켜져 있고 개발 모드일 때만 `NODE_TLS_REJECT_UNAUTHORIZED=0` 을 둔다
   (`lib/appAdminApi.ts`). 더 엄격하게 하려면 셸에서 `NODE_EXTRA_CA_CERTS` 를
-  mkcert 루트 CA(`%LOCALAPPDATA%\mkcertootCA.pem`)로 지정한다 —
+  mkcert 루트 CA(`%LOCALAPPDATA%\mkcert
+ootCA.pem`)로 지정한다 —
   Node 가 **시작할 때** 읽으므로 `.env.local` 에 넣어도 안 먹는다
 - 운영에서는 이 완화가 절대 켜지지 않는다
 
