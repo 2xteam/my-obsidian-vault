@@ -3,7 +3,7 @@ title: G 소셜 로그인
 type: plan
 tags: [plan, auth, oauth]
 updated: 2026-09-10
-status: 셋 구현 완료 (2026-09-10) — 구글 운영 확인 · 카카오 콘솔 완료(환경 변수 대기) · 네이버 콘솔 대기
+status: 완료 (2026-09-10) — 구글 · 카카오 · 네이버 운영 중
 applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 ---
 
@@ -198,6 +198,24 @@ myjane/app/api/auth/oauth/naver/{start,callback}
 4. 등록 후 Client ID · Client Secret → Vercel `NAVER_CLIENT_ID` · `NAVER_CLIENT_SECRET` → 재배포
 5. 처음엔 "개발 중" 상태라 등록한 테스터(멤버관리)만 로그인된다. 누구나 쓰게 하려면 **검수 요청**(네이버 로그인 검수 — 서비스 URL·방침 URL 확인, 보통 며칠)
 
+## 배포 확인 (2026-09-10 운영)
+
+```
+/api/auth/oauth/providers   {"google":true,"kakao":true,"naver":true}
+start 셋                     302 → accounts.google.com · kauth.kakao.com · nid.naver.com
+구글                          운영자 계정으로 실제 로그인 확인 (기존 이메일 회원에 자동 연결)
+```
+카카오·네이버는 운영자가 콘솔·환경 변수까지 마쳤다. 실제 로그인 왕복은 운영자가 확인한다.
+네이버는 "개발 중" 상태면 등록한 테스터만 로그인된다 — 공개하려면 검수 요청.
+
+### 남은 것
+
+- [ ] 카카오·네이버 실제 로그인 한 번씩(첫 가입 동의 화면 → 앱 복귀 → 재로그인) — 운영자
+- [ ] 네이버 검수 요청 (공개 전환)
+- [ ] My 화면 "연결된 계정" 목록·연결 해제 (연결 API 는 `start?link=1` 로 준비됨). 비밀번호 없는 계정은 마지막 연결을 못 뗀다
+- [ ] 비밀번호 찾기에서 소셜 전용 계정 안내 (로그인 뒤 My 에서만)
+- [ ] 관리자 회원 목록에 로그인 수단 표시(`providers`)
+
 ### ⚠️ 함정 — `NextResponse.redirect` 는 절대 URL 만 (2026-09-10 첫 운영 시도)
 
 콜백이 세션을 내리고 `"/"` 로 보내려다 **500** 이 났다. `NextResponse.redirect("/")` 는 URL 이 아니라며 던진다.
@@ -215,14 +233,14 @@ myjane/app/api/auth/oauth/naver/{start,callback}
 
 ## 8. 순서와 검증
 
-1. [ ] 콘솔 등록 · 환경 변수 (운영자) — 구글부터
+1. [x] 콘솔 등록 · 환경 변수 셋 (운영자, 2026-09-10)
 2. [x] 스키마 `providers` 여섯 앱 + 부분 유일 인덱스 (2026-09-10)
 3. [x] 구글 start → callback → 세션 (2026-09-10 구현 · 운영 확인은 환경 변수 뒤). 자녀 있는 계정 · `from=fitlog` 복귀 · state 불일치 400 · 미검증 이메일 → ③ 확인
 4. [x] 카카오 · 네이버 추가 (2026-09-10 구현). 콘솔은 카카오 완료 · 네이버 대기
 5. [x] 첫 가입 동의 화면 · 동의 없이 `complete` 호출 → 400 (2026-09-10)
 6. [x] 로그인 화면 구글 버튼 (2026-09-10)
 7. [x] 방침·쿠키 안내 · `POLICY_VERSION 2026-09-10`
-8. [ ] 운영에서 세 공급자 실제 로그인 한 번씩 · 인스타 인앱 브라우저에서도
+8. [ ] 운영에서 세 공급자 실제 로그인 한 번씩 · 인스타 인앱 브라우저에서도 (구글은 확인)
 
 ## 사용자가 정할 것
 

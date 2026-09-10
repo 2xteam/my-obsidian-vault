@@ -2,7 +2,7 @@
 title: C 법적 페이지
 type: plan
 tags: [plan, legal, privacy]
-updated: 2026-09-09
+updated: 2026-09-10
 status: 배포됨 (2026-09-08) — 법률 검토 대기
 applies-to: [myjane]
 ---
@@ -646,6 +646,12 @@ valid in HTTP headers: non-ASCII character (0x3157) at position 0 …
 - **R2 고아 파일**은 지울 방법이 없다 (위 참고)
 - 정리 작업이 앱을 부르는 것을 **운영에서 아직 확인하지 못했다.**
   대상이 생기는 것은 첫 탈퇴로부터 6개월 뒤다
+
+## 소셜 로그인 반영 (2026-09-10)
+
+방침 4항 위탁·제3자 표에 **Google(구글 로그인) · Kakao(카카오 로그인) · Naver(네이버 로그인)** 세 행 — 받는 것은
+이메일 · 이름/별명 · 계정 고유값, 공급자 토큰은 저장하지 않는다. 쿠키 안내에 `oauth_state` · `oauth_signup`(10분 · HttpOnly).
+`POLICY_VERSION 2026-09-10` 으로 올려 개정 안내 띠가 알린다. → [[G 소셜 로그인]]
 
 ## 크론 폐기 — 확인하는 방법 (2026-09-09 가이드)
 

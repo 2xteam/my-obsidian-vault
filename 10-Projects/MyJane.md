@@ -24,7 +24,8 @@ myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 랜딩(`/`)은 여전히 정적이고, 인증 라우트만 서버에서 돈다.
 
 필요한 환경 변수: `MONGO_URI` `MONGO_USER_DB` `NEXT_PUBLIC_COOKIE_DOMAIN`
-`NEXT_PUBLIC_BASE_URL` `SMTP_*` `SESSION_SECRET` `ADMIN_API_SECRET` — `NEXT_PUBLIC_*` 은
+`NEXT_PUBLIC_BASE_URL` `SMTP_*` `SESSION_SECRET` `ADMIN_API_SECRET` `CRON_SECRET` `APP_*_ORIGIN`
+`GOOGLE_CLIENT_ID/SECRET` `KAKAO_CLIENT_ID/SECRET` `NAVER_CLIENT_ID/SECRET`(소셜 로그인, 2026-09-10) — `NEXT_PUBLIC_*` 은
 **Config 타입**이어야 한다.
 
 `SESSION_SECRET`은 세션 서명 키다. **2hbk 배포와 같은 값**이어야 한다
@@ -76,6 +77,9 @@ myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 → [[인증과 세션 공유]]
 
 ## 통합 로그인
+
+**2026-09-10 부터 소셜 로그인(구글 · 카카오 · 네이버)이 붙었다.** 로그인 화면 맨 위에 버튼 셋, 그 아래 이메일 폼.
+첫 가입은 `/signup/social` 동의 화면 한 번. 매칭·콘솔 절차·함정은 [[G 소셜 로그인]], 수단 표는 [[인증과 세션 공유]].
 
 네 앱의 로그인·회원가입을 여기로 모았다.
 
