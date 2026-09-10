@@ -3,7 +3,7 @@ title: G 소셜 로그인
 type: plan
 tags: [plan, auth, oauth]
 updated: 2026-09-10
-status: 가이드 — 착수 전 (사용자 결정 대기)
+status: 구글 구현 완료 (2026-09-10) — 콘솔 등록·환경 변수 대기 · 카카오·네이버는 뒤에
 applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 ---
 
@@ -123,15 +123,46 @@ myjane/app/(app)/my … 연결 관리(선택)          "연결된 계정" 목록
 myjane/app/legal/privacy/page.tsx · cookies    문구
 ```
 
+## 구현 — 구글 (2026-09-10, 사용자 "구글부터")
+
+```
+myjane/lib/oauth/state.ts                 oauth_state · oauth_signup 서명 쿠키(10분 · HttpOnly) · portalOrigin
+myjane/lib/oauth/google.ts                인가 URL · 코드 교환 · tokeninfo 로 id_token 검증(aud · nonce · iss)
+myjane/app/api/auth/oauth/providers       어느 버튼을 그릴지 — 환경 변수 있는 공급자만
+myjane/app/api/auth/oauth/google/start    state·nonce·from·next 쿠키 → 구글 302 (`?link=1` 이면 연결 모드)
+myjane/app/api/auth/oauth/google/callback 3장 매칭 ①②③④ → redirectWithSession · 자녀 있으면 /login?pick=
+myjane/app/api/auth/oauth/complete        GET 프로필 미리보기 · POST 첫 가입(동의 3개 · 이름 · 미검증이면 이메일 입력)
+myjane/app/signup/social                  첫 가입 동의 화면
+myjane/lib/profileSession.ts              displayUser · redirectWithSession(표시용 snap_user 까지 서버가 내린다)
+myjane/app/api/auth/pick-profile GET      ?pickToken= 으로 프로필 목록 (302 흐름용)
+myjane/app/login                          구글 버튼(브랜드 규정) · ?pick= · ?oauth_error=
+여섯 models/User.ts                       providers[] + 부분 유일 인덱스 providers_unique
+방침 4항 위탁 표 "Google (구글 로그인)" · 쿠키 안내 oauth_state·oauth_signup · POLICY_VERSION 2026-09-10
+```
+
+- **환경 변수가 없으면 버튼이 안 보인다** (`/api/auth/oauth/providers` 가 false). 배포해도 안전하다
+- 리다이렉트 URI 는 `portalOrigin()` — 운영은 `NEXT_PUBLIC_BASE_URL`, 로컬은 요청 host. 콘솔에 **둘 다** 등록
+- 비밀번호 없는 회원이 생긴다. 로그인 라우트는 password 없는 계정을 건너뛰고, `passwordAgeDays` 는 password 없으면 null 이라 갱신 안내가 뜨지 않는다
+- 아직 없는 것: My 화면 "연결된 계정"(연결 API 는 `start?link=1` 로 준비됨) · 카카오 · 네이버
+
+### 운영자가 할 것 (배포 뒤)
+
+1. Google Cloud Console → API 및 서비스 → OAuth 동의 화면(외부 · 앱 이름 myjane · 방침 URL `https://www.myjane.co.kr/legal/privacy`) →
+   사용자 인증 정보 → **OAuth 클라이언트 ID(웹 애플리케이션)**. 승인된 리디렉션 URI 둘:
+   `https://www.myjane.co.kr/api/auth/oauth/google/callback` · `http://localhost:3000/api/auth/oauth/google/callback`
+2. Vercel myjane 프로덕션 환경 변수 `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` → 재배포. 로컬 `.env.local` 에도
+3. 동의 화면이 "테스트" 상태면 테스트 사용자에 등록된 구글 계정만 로그인된다. 공개하려면 "게시" (민감 범위가 아니라 검토 없이 된다)
+4. 확인 — 로그인 화면에 구글 버튼 → 첫 로그인은 동의 화면 → 가입 → 앱 복귀 · 두 번째는 바로 · 기존 이메일 회원이 같은 구글로 로그인하면 연결 · 자녀 있는 계정은 프로필 선택
+
 ## 8. 순서와 검증
 
-1. [ ] 콘솔 셋 등록 · 환경 변수 6개를 포털 Vercel 에 (운영자)
-2. [ ] 스키마 `providers` 여섯 앱 + 부분 유일 인덱스
-3. [ ] 구글 하나로 start → callback → 세션까지 끝낸다. 자녀 있는 계정 · `from=fitlog` 복귀 · state 불일치 400 · 미검증 이메일 → ③ 확인
+1. [ ] 콘솔 등록 · 환경 변수 (운영자) — 구글부터
+2. [x] 스키마 `providers` 여섯 앱 + 부분 유일 인덱스 (2026-09-10)
+3. [x] 구글 start → callback → 세션 (2026-09-10 구현 · 운영 확인은 환경 변수 뒤). 자녀 있는 계정 · `from=fitlog` 복귀 · state 불일치 400 · 미검증 이메일 → ③ 확인
 4. [ ] 카카오 · 네이버 추가 (프로필 API 만 다르다)
-5. [ ] 첫 가입 동의 화면 · 동의 없이 `complete` 호출 → 400
-6. [ ] 로그인 화면 버튼 · 브랜드 규정 확인
-7. [ ] 방침·쿠키 안내 · `POLICY_VERSION`
+5. [x] 첫 가입 동의 화면 · 동의 없이 `complete` 호출 → 400 (2026-09-10)
+6. [x] 로그인 화면 구글 버튼 (2026-09-10)
+7. [x] 방침·쿠키 안내 · `POLICY_VERSION 2026-09-10`
 8. [ ] 운영에서 세 공급자 실제 로그인 한 번씩 · 인스타 인앱 브라우저에서도
 
 ## 사용자가 정할 것
