@@ -8,7 +8,7 @@ local: C:\Dev\fitlog
 branch: main
 db: fit
 tags: [project, myjane]
-updated: 2026-09-09
+updated: 2026-09-10
 ---
 
 # FitLog
@@ -223,6 +223,12 @@ ALT · LDL · 중성지방 · HbA1c · eGFR 다섯이라 헤드라인도 "핵심
 
 인스타그램용 카드 8장과 본문을 `docs/marketing/` 에 두었다 (`instagram-fitlog.html` · `instagram-fitlog-caption.md`).
 절차와 규칙은 [[SNS 소개 카드와 게시글]]. 캡처·게시는 운영자가 한다.
+
+### 상세 화면에도 같은 차트 (2026-09-10 사용자 요청)
+
+`/measurements/[id]` 에 핵심 3종 삼각 레이더(`BodyRadar`), `/blood/[id]` 에 핵심 5축 스포크 차트(`BloodRadar`)를
+RECORD 시트 바로 아래 MAIN 시트로 넣었다. 목록 화면과 **같은 컴포넌트**를 그 결과지 한 장으로 그린다 —
+목록은 최근 기록, 상세는 그 날. 인바디 상세는 범위 계산에 `useProfile`(키·성별)이 필요해 함께 불러온다.
 
 ## 인바디 쪽에 남았던 비대칭 (2026-09-05 해소)
 
