@@ -3,7 +3,7 @@ title: G 소셜 로그인
 type: plan
 tags: [plan, auth, oauth]
 updated: 2026-09-10
-status: 구글 운영 확인 · 카카오 구현 완료 (2026-09-10) — 카카오 콘솔·환경 변수 대기 · 네이버는 뒤에
+status: 셋 구현 완료 (2026-09-10) — 구글 운영 확인 · 카카오 콘솔 완료(환경 변수 대기) · 네이버 콘솔 대기
 applies-to: [myjane, SnapWord, SnapNote, fitlog, 2hbk, typelog]
 ---
 
@@ -170,6 +170,34 @@ myjane/app/api/auth/oauth/kakao/{start,callback}
 6. [앱 설정 → 일반] 개인정보처리방침 URL `https://www.myjane.co.kr/legal/privacy` · 서비스 약관 `…/legal/terms`
 7. Vercel myjane 환경 변수 → 재배포 → 로그인 화면에 노란 버튼. 팀원 외 사용자도 되게 하려면 [비즈니스] 은 필요 없다(개인 앱도 로그인은 공개) — 단 이메일 필수 동의만 못 쓴다
 
+## 구현 — 네이버 (2026-09-10)
+
+```
+myjane/lib/oauth/naver.ts                 인가 URL · 토큰 교환(GET, state 포함) · v1/nid/me
+myjane/app/api/auth/oauth/naver/{start,callback}
+로그인 화면 네이버 버튼(#03C75A · 흰 글자 · N) · providers 라우트 · 방침 4항 · 쿠키 문구 · .env.example
+```
+
+- 네이버 이메일은 네이버 계정에 확인된 주소라 **검증된 것**으로 본다 → 기존 이메일 회원에 자동 연결(②). 제공 정보에서 이메일을 **필수**로 켜 둔다
+- `NAVER_CLIENT_ID` · `NAVER_CLIENT_SECRET` 둘 다 있어야 버튼이 보인다
+
+### 카카오 콘솔에서 겪은 것 (2026-09-10)
+
+- 새 콘솔은 **개인 앱에 이메일 동의항목을 열어 주지 않는다**("권한 없음"). "개인 개발자 비즈 앱 전환"(본인인증 + 통합 약관, 사업자번호 불요)을 하면 열리고 **필수 동의**까지 된다 — 운영자가 전환했다
+- 그래서 카카오 인가 요청에 **scope 를 보내지 않는다.** 콘솔에 켜진 동의항목을 카카오가 알아서 묻는다. scope 에 `account_email` 을 적었다가 권한이 없으면 `invalid_scope` 로 거절된다
+- "REST API 키 수정" 의 **호출 허용 IP 주소는 비운다** — 도메인을 넣는 칸이 아니고, 값이 있으면 Vercel(고정 IP 없음)에서 토큰 발급이 막힌다. 리다이렉트 URI 는 같은 화면 "카카오 로그인 리다이렉트 URI" 에
+- 클라이언트 시크릿은 REST API 키를 만들 때 **기본 활성화**다 — "카카오 로그인" 행의 코드가 `KAKAO_CLIENT_SECRET`. 켜져 있으면 토큰 요청에 반드시 넣어야 한다(코드는 있으면 넣는다)
+- "앱 → 일반" 에는 방침·약관 URL 칸이 없다(앱 대표 도메인만). 할 일 없음
+
+### 운영자가 할 것 — 네이버
+
+1. developers.naver.com → Application → **애플리케이션 등록**. 이름 `myjane` · 사용 API **네이버 로그인**
+2. 제공 정보 선택 — **이메일 주소 필수**, 별명(선택) · 이름(선택). 그 외는 받지 않는다
+3. 로그인 오픈 API 서비스 환경 **PC 웹**. 서비스 URL `https://www.myjane.co.kr`. **Callback URL** 둘:
+   `https://www.myjane.co.kr/api/auth/oauth/naver/callback` · `http://localhost:3000/api/auth/oauth/naver/callback`
+4. 등록 후 Client ID · Client Secret → Vercel `NAVER_CLIENT_ID` · `NAVER_CLIENT_SECRET` → 재배포
+5. 처음엔 "개발 중" 상태라 등록한 테스터(멤버관리)만 로그인된다. 누구나 쓰게 하려면 **검수 요청**(네이버 로그인 검수 — 서비스 URL·방침 URL 확인, 보통 며칠)
+
 ### ⚠️ 함정 — `NextResponse.redirect` 는 절대 URL 만 (2026-09-10 첫 운영 시도)
 
 콜백이 세션을 내리고 `"/"` 로 보내려다 **500** 이 났다. `NextResponse.redirect("/")` 는 URL 이 아니라며 던진다.
@@ -190,7 +218,7 @@ myjane/app/api/auth/oauth/kakao/{start,callback}
 1. [ ] 콘솔 등록 · 환경 변수 (운영자) — 구글부터
 2. [x] 스키마 `providers` 여섯 앱 + 부분 유일 인덱스 (2026-09-10)
 3. [x] 구글 start → callback → 세션 (2026-09-10 구현 · 운영 확인은 환경 변수 뒤). 자녀 있는 계정 · `from=fitlog` 복귀 · state 불일치 400 · 미검증 이메일 → ③ 확인
-4. [x] 카카오 추가 (2026-09-10 구현 · 콘솔 대기) · [ ] 네이버
+4. [x] 카카오 · 네이버 추가 (2026-09-10 구현). 콘솔은 카카오 완료 · 네이버 대기
 5. [x] 첫 가입 동의 화면 · 동의 없이 `complete` 호출 → 400 (2026-09-10)
 6. [x] 로그인 화면 구글 버튼 (2026-09-10)
 7. [x] 방침·쿠키 안내 · `POLICY_VERSION 2026-09-10`
