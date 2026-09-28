@@ -36,9 +36,17 @@ Next.js 15 · React 19 · MongoDB(mongoose 9) · Cloudflare R2 · Tiptap 3 에�
 - [x] EC2 배포 워크플로 비활성화
 - [x] Vercel 프로젝트 생성·배포 (2026-09-28)
 - [x] 가비아 DNS 전환 — `@` A `216.198.79.1` (308 → www), `www` CNAME `…vercel-dns-017.com`
-- [ ] 컷오버 후 **AWS Elastic IP 해제** (인스턴스만 종료하면 계속 과금)
+- [x] 환경 변수 15개 등록 + 재배포 (2026-09-28) — **이게 빠져서 DB·관리자 로그인이 모두 죽어 있었다**
+- [x] EC2 배포 워크플로·문서 삭제 (2026-09-28)
+- [ ] GitHub Secrets `EC2_HOST` · `EC2_USER` · `EC2_SSH_KEY` 삭제
+- [ ] **AWS Elastic IP 해제** (인스턴스만 종료하면 계속 과금)
 - [ ] Atlas Network Access 에서 EC2 IP 항목 제거
-- [ ] `.github/workflows/deploy-ec2.yml` 삭제 (현재는 수동 실행만 가능하도록 비활성)
+
+> 이관 직후 증상은 "데이터가 안 보인다" 였지만 원인은 **환경 변수가 통째로 비어 있던 것**이다.
+> 관리자 로그인 화면의 `ADMIN_PASSWORD가 설정되어 있지 않습니다` 가 결정적 단서였다 —
+> DB만 보고 있었으면 더 돌아갔을 것이다. 한 변수가 비면 나머지도 의심한다.
+>
+> 로컬 `.env.local` 은 표준 URI 였고 Vercel 에는 **SRV**(`cluster0.dvwxz9v.mongodb.net`)를 넣었다.
 
 절차: 저장소 `docs/vercel-migration.md`
 
