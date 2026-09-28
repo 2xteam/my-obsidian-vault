@@ -2,7 +2,7 @@
 title: Home
 type: moc
 tags: [moc]
-updated: 2026-09-10
+updated: 2026-09-18
 ---
 
 # Home
@@ -32,6 +32,8 @@ updated: 2026-09-10
 | [[FitLog]] | `fitlog.myjane.co.kr` | **3003** | 건강 기록 — 인바디 결과지 기록·추이 |
 | [[2hbk]] | `2hbk.myjane.co.kr` | **3004** | 습관 기록 — 목표에 스티커 모아 채우기 |
 | [[TypeLog]] | `typelog.myjane.co.kr` | **3005** | 성향 기록 — 타입 놀이 (준비 중) |
+| [[CalmTouch]] | `calmtouch.myjane.co.kr` | **3007** | 마음 기록 — 만지면 잔잔해지는 화면 (개발 중 · 저장소 미생성) |
+| [[AIKit]] | `aikit.myjane.co.kr` | **3008** | 프롬프트 기록 — 사진에서 피사체를 뽑아 프롬프트에 얹는다 (2026-09-18 배포) |
 | [[jangmini]] | `jangmini.myjane.co.kr` | **3006** | **성격이 다르다** — AI 챗봇형 개인 포트폴리오 (구현 완료 · 운영 채팅 개방 대기) |
 | [[Ignite]] | `www.ignitearch.co.kr` | — | 건축사무소 웹사이트 |
 | [[결쩜사]] | `kyulzzumsa.co.kr` | — | 매칭 서비스 (디자인 참고 대상) |
@@ -41,7 +43,7 @@ updated: 2026-09-10
 포트 번호를 프로젝트 노트마다 나열하면 어긋나므로 **각 노트는 자기 번호만** 적는다.
 
 검증용 서버는 **+10** 이다 (`npm run dev:verify` · `.next-verify`) —
-3010 · 3011 · 3012 · 3013 · 3014 · 3015 · 3016.
+3010 · 3011 · 3012 · 3013 · 3014 · 3015 · 3016 · 3017 · 3018.
 사용자 서버와 같은 `.next` 나 `tsconfig.json` 을 건드리면 먹통이 된다
 → [[개발 서버와 검증 환경]]
 

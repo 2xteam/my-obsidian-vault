@@ -2,7 +2,7 @@
 title: Cloudflare R2
 type: infra
 tags: [infra, r2, storage]
-updated: 2026-09-08
+updated: 2026-09-18
 ---
 
 # Cloudflare R2
@@ -19,8 +19,22 @@ updated: 2026-09-08
 | `templete` | klead 등 공유 버킷 (앱별 프리픽스로 분리) |
 | `2hbk` | 2hbk 프로필·목표 이미지 |
 | `jangmini` | jangmini 포트폴리오 이미지 (Notion 에서 이관) |
+| `aikit` | AIKit 사용자 이미지 — **아직 만들지 않았다** (2026-09-18 이름만 확정) |
 
 계정이 서비스별로 다를 수 있으니 `R2_ACCOUNT_ID`를 확인한다.
+
+### ⚠️ AIKit 버킷은 **공개 읽기를 켜지 않는다**
+
+지금까지의 버킷은 전부 Public Development URL(`pub-….r2.dev`)로 이미지를 내보냈다.
+AIKit 만 다르다 — 사용자가 올린 사진이고 **공유를 켜고 끌 수 있어야** 하는데,
+직링크가 한 번 나가면 크롤러와 CDN 캐시에 남아서 **끄기가 실제로 먹지 않는다.**
+
+그래서 AIKit 의 `lib/r2.ts` 에는 다른 앱에 있는 `getR2PublicUrl()` 이 **없고**
+`R2_PUBLIC_URL` 환경 변수도 없다. 이미지는 앱 라우트가 세션을 확인한 뒤
+스트리밍한다. **다른 앱의 `lib/r2.ts` 를 복사해 올 때 이 함수를 같이 들여오지 말 것.**
+
+`aikit/scripts/check-r2.mjs` 도 공개 URL 대신 `GetObject` 로 확인하고,
+`R2_PUBLIC_URL` 이 설정돼 있으면 경고한다 → [[H AIKit 구축]] "이미지 공개 원칙"
 
 ## CORS
 

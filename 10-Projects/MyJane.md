@@ -68,7 +68,8 @@ myjane.co.kr 포털. 통합 로그인과 서비스 안내를 맡는다.
 | 히어로(dark) | "필요한 기록만, 골라서 쌓아요" |
 | STUDY(white) | 공부 기록 — SnapWord · SnapNote 2단 카드 |
 | HEALTH(tint) | 건강 기록 — FitLog 단독 카드(`.apps--solo`, 620px 중앙) |
-| HABIT(white) | 습관 기록 — 2hbk 단독 카드 |
+| HABIT(tint) | 습관 기록 — 2hbk 단독 카드 |
+| CALM(white) | 마음 쉼 — CalmTouch 단독 카드 (2026-09-10) |
 | ABOUT(tint) | "묶어둔 건 계정뿐이에요" 4개 항목 |
 | START(white) | 회원가입 CTA — **로그인 상태에서는 감춤** |
 
@@ -150,6 +151,7 @@ HEALTH  건강 기록   FitLog
 TYPE    성향 기록   TypeLog
 STUDY   공부 기록   SnapWord · SnapNote
 HABIT   습관 기록   2hbk
+CALM    마음 쉼     CalmTouch   (2026-09-10 추가 — 흰색. 뒤의 ABOUT 이 연청록으로, HOW IT WORKS 가 흰색으로 바뀌었다)
 ABOUT MYJANE
 ```
 
