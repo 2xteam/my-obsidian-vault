@@ -2,7 +2,7 @@
 title: Projects MOC
 type: moc
 tags: [moc]
-updated: 2026-09-18
+updated: 2026-09-28
 ---
 
 # Projects MOC
@@ -50,7 +50,9 @@ updated: 2026-09-18
 - [[jangmini]] — AI 챗봇형 개인 포트폴리오 · `jangmini.myjane.co.kr` · `jangmini` · **계획**
   **myjane 서비스가 아니다.** 도메인만 하위에 두고 회원·세션·디자인·admin 을 공유하지
   않는다. 왜 다른지는 [[jangmini]] 첫 표에 있다 → [[D jangmini 구축]]
-- [[Ignite]] — 건축사무소 · Vercel 이관 대기
+- [[Ignite]] — 건축사무소 웹사이트 · `www.ignitearch.co.kr` · `ignite` DB · **운영중**
+  저장소가 `Seuyup/ignite` 로 계정부터 다르다. 회원·세션·디자인을 공유하지 않는다.
+  2026-09-28 EC2 → Vercel 이관 완료 (도메인 컷오버 · EC2 배포 워크플로 제거)
 
 ## 참고 사이트
 

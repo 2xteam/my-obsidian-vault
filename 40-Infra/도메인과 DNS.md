@@ -2,7 +2,7 @@
 title: 도메인과 DNS
 type: infra
 tags: [infra, dns, gabia]
-updated: 2026-09-03
+updated: 2026-09-28
 ---
 
 # 도메인과 DNS
@@ -27,10 +27,11 @@ TTL은 600으로 유지 — 문제 시 10분 내 롤백.
 
 | 호스트 | 타입 | 대상 |
 |---|---|---|
-| `@` | A | `3.35.114.6` (AWS EC2) |
-| `www` | A | `3.35.114.6` |
+| `@` | A | `216.198.79.1` (Vercel) — 308 리다이렉트로 `www` 로 보낸다 |
+| `www` | CNAME | `833a11e9d08debb0.vercel-dns-017.com` |
 
-MX 없음. Vercel 이관 시 두 레코드를 함께 바꾼다 → [[Ignite]]
+MX 없음. 2026-09-28 EC2(`3.35.114.6`) → Vercel 로 두 레코드를 함께 바꿨다 → [[Ignite]]
+**Elastic IP `3.35.114.6` 해제는 아직 남아 있다** — 인스턴스를 종료해도 IP 를 잡고 있으면 과금된다.
 
 ## 가비아 DNS 관리툴 주의사항
 
@@ -46,3 +47,4 @@ MX 없음. Vercel 이관 시 두 레코드를 함께 바꾼다 → [[Ignite]]
 - 2026-09-02 myjane apex·www: Cloudways → Vercel, **Cloudways 서버 완전 삭제**
 - 2026-09-02 fitlog 신규 연결
 - 2026-09-03 `2hbk` 신규 연결 → [[2hbk]]
+- 2026-09-28 ignitearch apex·www: AWS EC2 → Vercel → [[Ignite]]

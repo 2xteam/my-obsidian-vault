@@ -2,7 +2,7 @@
 title: Home
 type: moc
 tags: [moc]
-updated: 2026-09-18
+updated: 2026-09-28
 ---
 
 # Home
@@ -35,7 +35,7 @@ updated: 2026-09-18
 | [[CalmTouch]] | `calmtouch.myjane.co.kr` | **3007** | 마음 기록 — 만지면 잔잔해지는 화면 (개발 중 · 저장소 미생성) |
 | [[AIKit]] | `aikit.myjane.co.kr` | **3008** | 프롬프트 기록 — 사진에서 피사체를 뽑아 프롬프트에 얹는다 (2026-09-18 배포) |
 | [[jangmini]] | `jangmini.myjane.co.kr` | **3006** | **성격이 다르다** — AI 챗봇형 개인 포트폴리오 (구현 완료 · 운영 채팅 개방 대기) |
-| [[Ignite]] | `www.ignitearch.co.kr` | — | 건축사무소 웹사이트 |
+| [[Ignite]] | `www.ignitearch.co.kr` | — | **성격이 다르다** — 건축사무소 웹사이트. 저장소 계정도 회원도 별개 (2026-09-28 EC2 → Vercel 이관 완료) |
 | [[결쩜사]] | `kyulzzumsa.co.kr` | — | 매칭 서비스 (디자인 참고 대상) |
 
 **로컬 개발 포트는 이 표가 유일한 기준이다.** 2026-09-04에 포털을 3000으로 옮기면서
