@@ -2,7 +2,7 @@
 title: 통합 admin
 type: pattern
 tags: [pattern, admin, myjane]
-updated: 2026-09-10
+updated: 2026-10-01
 ---
 
 # 통합 admin
@@ -62,6 +62,45 @@ tables?: { title: string; columns: string[]; rows: (string|number)[][] }[]  // �
   있게 두면 운영자 하나만 뚫려도 마스터가 늘어난다
 - 마스터가 운영자를 세우고 내린다. 운영자는 권한 관리를 못 한다
 - 마스터 계정은 API 로 건드릴 수 없다(자기 발등을 찍는 것도 막는다)
+
+## 대리 로그인 (2026-10-01)
+
+`/admin/members` 의 **"이 계정으로 로그인"** — 관리자가 고객 계정으로 들어가 고객이 보는 화면을 그대로 본다.
+원본: `myjane/lib/impersonation.ts`
+
+| 단계 | 어떻게 |
+|---|---|
+| 시작 | `POST /api/admin/users/:id/impersonate` — 마스터·운영자. **관리자·탈퇴·자기 계정은 막는다**. 고객 토큰(`exp` 1시간, `imp` = 관리자 `_id`)을 `snap_session` 에, 관리자 본인 토큰은 `snap_admin_restore`(HttpOnly)에 맡긴다 |
+| 만료 | 토큰 `exp` 가 정한다. **모든 앱이 exp 를 검사하므로 앱 코드를 고치지 않아도 함께 끊긴다** |
+| 연장 | `POST /api/impersonation/extend` — 남은 **5분 이내에만** 1시간씩. 매번 관리자 권한을 다시 본다 |
+| 종료 | `POST /api/impersonation/end` — 맡긴 토큰으로 관리자 세션을 되돌리고 `/admin/members` 로. 만료 뒤에도 된다 |
+| 경고 바 | `components/ImpersonationBar.tsx` — **포털과 여섯 앱에 복사본**. 읽을 수 있는 표지 `snap_imp`({exp, name, by})를 보고 맨 위에 빨간 바. 남은 시간 초 단위, 0 이면 자동 종료. 연장·종료는 포털로 폼 POST |
+
+지키는 것
+
+- 대리 세션에서는 `requireSessionUser` 가 **언제나 403** — 비밀번호·탈퇴·이메일·동의·자녀 관리
+- **프로필 전환(`/api/auth/switch`)·소셜 연결도 막는다.** 둘 다 30일짜리 새 토큰을 내줘서 1시간 제한을 벗어나는 통로였다
+- 시작·연장·종료·만료를 `user` DB `admin_audit_logs` 에 남긴다(누가·누구로·언제·IP·UA). 지우지 않는다
+- 연장·종료는 우리 도메인 Origin 만, 돌아갈 `next` 도 우리 도메인만(오픈 리다이렉트 방지)
+- ⚠️ 표지 `snap_imp` 는 만료 뒤 **10분 더** 남긴다. 세션과 같이 사라지면 바가 0초를 못 봐서 자동 종료를 못 보낸다
+- 로그아웃하면 `snap_imp` · `snap_admin_restore` 도 지운다(포털·여섯 앱 `clearSessionCookieHeaders`)
+- 대리 중 기록을 바꾸면 **실제 고객 기록이 바뀐다.** 읽기 전용 모드는 없다
+
+## 확인 창은 화면 안에 (2026-10-01)
+
+관리 화면의 확인은 브라우저 `confirm()` 을 쓰지 않는다 → `app/admin/ConfirmDialog.tsx` (`useConfirm`).
+기본 대화상자를 막는 브라우저(인앱·자동화 창)에서는 `confirm()` 이 곧바로 false 를 돌려줘
+**버튼을 눌러도 아무 일도 없었다** — 대리 로그인·운영자 세우기·공지 내리기·링크 지우기 네 곳 모두.
+
+## 목록 정렬·페이징 (2026-10-01)
+
+공용 부품 `app/admin/Pagination.tsx` — `Pagination`(총 건수·쪽 번호·쪽당 10/20/50/100/직접 입력, 상한 500) ·
+`SortableTh`(머리칸을 눌러 정렬) · `listQueryDefaults` · `listQueryParams`.
+
+- **서버에서** 정렬·자른다. API 는 `page`(1부터) · `pageSize` · `sort` · `dir` 를 받고 `total` 을 돌려준다
+- 같은 값은 `_id` 로 순서를 고정한다 — 쪽을 넘길 때 같은 행이 두 번 보이거나 빠지지 않게
+- 계산이 필요한 정렬(보이는 이름·수단 수·권한 순위)은 `aggregate` + `$facet`(행과 총 건수를 한 번에)
+- 첫 사용처: 회원 목록(기본 가입일 최근 순 20건). 옛 목록은 100건에서 잘려 대시보드 회원 수도 100 에 묶여 있었다
 
 ## ⚠️ PIN 을 쿼리스트링으로 검사하고 있었다
 
