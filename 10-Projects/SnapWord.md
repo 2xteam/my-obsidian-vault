@@ -82,14 +82,31 @@ Next.js 15 (App Router) · React 19 · TypeScript · MongoDB Atlas · OpenAI · 
 | 추출 | 화면은 `vocabId` 만 보내고, 서버가 **내 단어장**에서 언어를 읽어 한자 지침을 붙인다 (`lib/deckLanguage.ts`) |
 | 한자 출력 | 키는 영어와 같다. 훈·음은 칸을 따로 두지 않고 `meaning` 맨 앞 — `"배울 학 — 배우다"` |
 | 사전 | 단어에 한자(`\p{Script=Han}`)가 섞이면 `hanja.dict.naver.com/#/search?query=…&range=all`. 단어 글자로 고르므로 단어장이 섞이는 오답 화면에서도 맞다 |
+| 로그인 | 앱 로컬 로그인은 없앴다. 로컬은 localhost:3000 포털 → [[인증과 세션 공유]] |
 | 가이드 | `GuideStep.languages` — 영어 RSS 단계는 영어일 때만 |
 | AI 채팅 | "영어·한자 학습 전용". 한자 질문은 훈·음·부수·한자어로 답한다 |
 
 원본 코드: `lib/studyLanguage.ts`(순수 함수 — 서버도 쓴다) · `lib/useStudyLanguage.ts`(클라이언트 훅).
 `"use client"` 파일을 라우트가 import 하지 않도록 둘로 나눴다.
 
+### 2026-09-30 추가 분리
+
+| 자리 | 어떻게 |
+|---|---|
+| 채팅 | 영어·한자 **지시문을 따로**(`lib/chatOpenAi.ts`). RAG 청크마다 `language`. `ChatThread.language` 로 대화방이 갈리고 목록·칩·첫 안내·제목 짓기가 언어별. 카드의 "AI에게 질문" 은 그 단어장 언어로 |
+| AI 캐시 | 한자는 키 앞에 `hanja:` (`aiCacheKeyFor`). 영어 키는 그대로라 옛 캐시가 맞는다 |
+| 사진 추출 | 한자는 `gpt-4o` · 인쇄된 훈음 기준 · `cellCount` 로 이어 받기 · 한자만 남기기 → [[OpenAI Vision 추출 패턴]] |
+| 칸 이름 | `WORD_FIELD_LABELS` — 한자·훈음·뜻·한자어·예문·유의자·반의자. 저장 키는 같고 보이는 이름만 |
+| 글자 크기 | 한자가 섞인 단어는 **2배**(`wordFontSize`) — 학습·오답·시험 보기·점수·인쇄·입력 |
+| 폴더 | `Folder.language`(기본값 없음). 옛 폴더는 **안의 단어장으로 짐작**, 둘 다 있으면 양쪽에 보인다(`lib/folderLanguage.ts`). 폴더 목록에도 탭 |
+| 빈 단어장 | 단어가 없으면 Study · Test · Score 를 감춘다 |
+| 사전 | 한자사전 카드는 검색어 없이 첫 화면. 사전 링크는 `window.open` 으로 **언제나 새 창** |
+
+여러 단어장이 섞이는 화면(오답 복습·인쇄)은 단어 글자(`\p{Script=Han}`)로 언어를 고른다.
+
 남은 것:
 - [ ] 한자 전용 시험 유형 (훈음 → 글자, 글자 → 음) — `TEST_RESULT_TYPES` 확장
 - [ ] 예문 문제에서 정답 글자 가리기 (한자에서 특히 드러난다)
-- [ ] `ai_cache` 키가 단어 문자열뿐 — 언어를 넣을지
 - [ ] 오늘의 한자 (교육용 기초한자 목록을 앱에 두는 안)
+- [ ] 폴더 옮기기 — 영어·한자가 섞인 옛 루트 폴더("My")를 가를 수단
+- [ ] 이체자(亻·忄·扌)를 인쇄된 대로 둘지
