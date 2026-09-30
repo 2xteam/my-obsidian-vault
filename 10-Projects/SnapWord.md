@@ -8,7 +8,7 @@ local: C:\Dev\SnapWord
 branch: main
 db: vocab
 tags: [project, myjane]
-updated: 2026-09-07
+updated: 2026-09-30
 ---
 
 # SnapWord
@@ -24,7 +24,7 @@ Next.js 15 (App Router) · React 19 · TypeScript · MongoDB Atlas · OpenAI · 
 
 | 위치 | 내용 |
 |---|---|
-| `vocab` DB | `vocabularies` `words` `folders` `study_records` `test_sessions` `test_results` `chat_threads` `notices` `events` `inquiries` `ai_cache` `openai_request_logs` |
+| `vocab` DB | `vocabularies`(`language`: `en`·`hanja`) `words` `folders` `study_records` `test_sessions` `test_results` `chat_threads` `notices` `events` `inquiries` `ai_cache` `openai_request_logs` |
 | `user` DB | `users` — **세 앱 공용** ([[인증과 세션 공유]]) |
 
 ## 주요 기능
@@ -69,3 +69,27 @@ Next.js 15 (App Router) · React 19 · TypeScript · MongoDB Atlas · OpenAI · 
 여섯 앱이 **먹청 팔레트**를 공유한다. 원본은 `myjane/design/palette.json` 하나다.
 색을 바꿀 때는 거기만 고치고 myjane 에서 `npm run palette -- --write` 를 돌린다.
 `app/palette.css` 는 생성 파일이라 직접 고치지 않는다 → [[먹청 톤 팔레트]]
+
+## 학습 언어 — 영어 · 한자 (2026-09-30)
+
+기본은 영어. 화면 문구는 계속 한국어이고, 바뀌는 건 **공부하는 대상**뿐이라 i18n 은 쓰지 않는다.
+
+| 자리 | 어떻게 |
+|---|---|
+| 단어장 | `VocabularyDeck.language` = `en` \| `hanja`. **필드가 없는 옛 단어장은 영어** — 조회는 `{ language: { $ne: "hanja" } }` |
+| 홈 | 상단 `English` / `漢字` 탭. 고른 값은 **브라우저 localStorage** 에만 둔다 (공용 `users` 컬렉션은 여섯 앱이 쓰므로 건드리지 않는다) |
+| 한자일 때 홈 | 오늘의 Word(Merriam-Webster) · English Grammar 를 **요청조차 하지 않는다**. 자리에 네이버 한자사전 카드 |
+| 추출 | 화면은 `vocabId` 만 보내고, 서버가 **내 단어장**에서 언어를 읽어 한자 지침을 붙인다 (`lib/deckLanguage.ts`) |
+| 한자 출력 | 키는 영어와 같다. 훈·음은 칸을 따로 두지 않고 `meaning` 맨 앞 — `"배울 학 — 배우다"` |
+| 사전 | 단어에 한자(`\p{Script=Han}`)가 섞이면 `hanja.dict.naver.com/#/search?query=…&range=all`. 단어 글자로 고르므로 단어장이 섞이는 오답 화면에서도 맞다 |
+| 가이드 | `GuideStep.languages` — 영어 RSS 단계는 영어일 때만 |
+| AI 채팅 | "영어·한자 학습 전용". 한자 질문은 훈·음·부수·한자어로 답한다 |
+
+원본 코드: `lib/studyLanguage.ts`(순수 함수 — 서버도 쓴다) · `lib/useStudyLanguage.ts`(클라이언트 훅).
+`"use client"` 파일을 라우트가 import 하지 않도록 둘로 나눴다.
+
+남은 것:
+- [ ] 한자 전용 시험 유형 (훈음 → 글자, 글자 → 음) — `TEST_RESULT_TYPES` 확장
+- [ ] 예문 문제에서 정답 글자 가리기 (한자에서 특히 드러난다)
+- [ ] `ai_cache` 키가 단어 문자열뿐 — 언어를 넣을지
+- [ ] 오늘의 한자 (교육용 기초한자 목록을 앱에 두는 안)
