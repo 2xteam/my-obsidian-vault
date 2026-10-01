@@ -2,7 +2,7 @@
 title: Vercel 배포 패턴
 type: pattern
 tags: [pattern, vercel, infra]
-updated: 2026-09-28
+updated: 2026-10-01
 ---
 
 # Vercel 배포 패턴
@@ -64,6 +64,68 @@ alias·빌드 로그를 전부 확인하고 나서야 여기에 도달했는데,
 대응 — **`vercel.json`에 `"framework": "nextjs"`를 적는다.** 이 값이 대시보드
 설정을 덮으므로 저장소에 두면 다시 어긋날 일이 없다. 대시보드에서만 고치면
 프로젝트를 다시 만들 때 똑같이 밟는다.
+
+## 특정 라우트만 500 일 때 — 의존성이 서버리스에서 안 뜨는 경우
+
+2026-09-28 Ignite 이관 후 `/studio` · `/contact` · `/p/[slug]` **세 라우트만** 500.
+나머지는 정상. 로컬은 dev·production 빌드 모두 멀쩡했다.
+
+범위를 좁히는 방법 —
+
+1. **라우트별 공통 import 를 찾는다.** 실패하는 집합에만 있고 정상 집합에는 없는 것.
+   여기서는 `sanitizeRichHtml`(= `isomorphic-dompurify`) 하나였다
+2. **추적 파일로 확인한다.** `.next/server/app/<route>/page.js.nft.json` 의 `files` —
+   실패 라우트에만 jsdom 658개가 붙어 있었다
+
+```bash
+# 라우트별 추적 파일 수와 특정 패키지 포함 여부
+node -e "const d=require('./.next/server/app/studio/page.js.nft.json');
+console.log(d.files.length, d.files.filter(f=>f.includes('jsdom')).length)"
+```
+
+실제 원인은 **ESM/CJS 충돌**이었다.
+
+```
+require() of ES Module .../@exodus/bytes/encoding-lite.js
+from .../html-encoding-sniffer/...
+```
+
+jsdom 의 의존성이 ESM 전용인데 CJS 에서 `require()` 되었다. Node 버전은 이미
+요구사항을 만족(v22.23.2)했고, `serverExternalPackages` 로도 해결되지 않았다.
+
+### import 단계에서 터지면 함수 안 try/catch 로 못 잡는다
+
+정제 함수 안에 try/catch 를 둬도 500 이 그대로였다. 모듈을 **불러오는 중** 터지기
+때문이다. 이런 실패를 밖에서 보려면 **동적 import 를 try/catch 로 감싼 점검
+엔드포인트**가 필요하다.
+
+```ts
+try {
+  const mod = await import("@/lib/sanitize-html");
+  ok = mod.sanitizeRichHtml("<p>x</p>").includes("x");
+} catch (e) { error = `${e.name}: ${e.message}`; }   // ← 여기서 진짜 원인이 나온다
+```
+
+### 교훈: 서버리스에서는 DOM 구현을 끌어오는 패키지를 피한다
+
+`isomorphic-dompurify`(jsdom) → `sanitize-html`(htmlparser2, 순수 JS) 로 교체했다.
+추적 파일이 1,690개 → 549개로 줄어 콜드 스타트도 가벼워졌다.
+
+**정제기를 바꿀 때는 결과를 대조한다.** 허용 목록이 좁으면 본문의 inline style·id 가
+조용히 사라진다. 실제 DB 콘텐츠를 두 정제기로 돌려 태그·속성·style 값이 같은지
+비교했다(8/8 동일, 차이는 CSS 공백과 자기닫음 표기뿐).
+
+## /api/build-info — 지금 떠 있는 배포가 무엇인가
+
+"푸시했는데 그대로다" 를 확인할 방법이 없으면 배포 실패인지 수정이 부족한지
+구분할 수 없다. 커밋 해시와 런타임 Node 버전만 공개로 돌려주는 라우트를 둔다.
+
+```json
+{ "commit": "5bd212b", "branch": "main", "node": "v22.23.2", "region": "icn1" }
+```
+
+Vercel 자동 배포는 보통 **1~2분**이다. 그보다 오래 그대로면 배포가 아니라
+코드를 의심한다. (비밀값·환경 변수 유무는 여기 넣지 않는다 → 관리자 점검 라우트)
 
 ## 배포는 성공인데 화면이 비어 있을 때
 

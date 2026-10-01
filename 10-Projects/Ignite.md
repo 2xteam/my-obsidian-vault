@@ -7,7 +7,7 @@ repo: https://github.com/Seuyup/ignite
 local: C:\Dev\ignite
 branch: main
 tags: [project]
-updated: 2026-09-28
+updated: 2026-10-01
 ---
 
 # Ignite
@@ -61,3 +61,19 @@ Next.js 15 · React 19 · MongoDB(mongoose 9) · Cloudflare R2 · Tiptap 3 에�
   관리자 쿠키로 막지만 로그인은 `ADMIN_SECRET` HMAC 이라 **DB 없이도** 통과한다
 
 같은 함정이 다른 앱에도 있다 → [[Vercel 배포 패턴]]
+
+## 이관 후 두 번째 사고 — 세 라우트만 500 (2026-10-01)
+
+`/studio` · `/contact` · `/p/[slug]` 만 500. 공통점은 `sanitizeRichHtml` 하나였고,
+그 안의 `isomorphic-dompurify` 가 서버에서 jsdom 을 끌어온다. Vercel 에서
+jsdom 의 의존성이 ESM/CJS 로 충돌해 **import 단계**에서 터졌다.
+
+- 정제기를 `sanitize-html`(순수 JS) 로 교체. 결과는 실제 콘텐츠 8건으로 대조해 동일
+- Node 버전 문제도 아니었고(v22.23.2) `serverExternalPackages` 로도 안 됐다
+- `package.json` 에 `engines.node = 22.x` 를 남겼다 (`.nvmrc` 와 같은 메이저)
+- `/api/build-info` 로 지금 떠 있는 커밋과 런타임 Node 버전을 확인한다
+
+> `/privacy` 는 404 가 맞다. 관리자 `/admin/pages` 에서 만든 개별 페이지는
+> 실제 경로가 **`/p/<slug>`** 다. 사이트 안의 링크도 `/p/privacy` 로 걸려 있다.
+
+자세한 좁히는 방법 → [[Vercel 배포 패턴]]
