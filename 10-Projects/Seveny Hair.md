@@ -27,7 +27,7 @@ Next.js 15 · React 19 · Tailwind 3(preflight 끔) · MongoDB(mongoose 9) · �
 - [x] 2026-10-02 한글화 (메뉴·제목 영어 / 설명·가격·이력 한글, Pretendard · Noto Serif KR), 로고 SEV/ENY
 - [x] 2026-10-02 GitHub 연결(2xteam/seveny-hair) · Vercel 배포 오류 수정 (framework 명시, next/font 제거)
 - [x] 2026-10-02 SEO — 라우트 메타 · OG 이미지(next/og) · sitemap · robots · HairSalon JSON-LD
-- [x] 2026-10-02 모바일 고정 배경 확대 문제 → FixedBg 레이어
+- [x] 2026-10-02 모바일 고정 배경 확대 문제 → FixedBg (1차 fixed+clip 은 iOS 에서 실패, 2차 터치 기기 sticky 로 해결)
 - [ ] 이미지 R2 이전 → 타겟 CDN 허용 제거
 - [ ] 관리자 CMS (Ignite 패턴)
 - [ ] 고객 MongoDB 계정으로 `MONGODB_URI` 교체
@@ -68,7 +68,7 @@ Webflow 사이트는 움직임 정의가 JS 번들 안에 통째로 들어 있�
 
 ## 함정
 
-- **모바일 고정 배경** — `background-attachment: fixed` 를 모바일이 무시해 Milestones 배경이 크게 확대됐다. PC 를 좁혀 보면 정상이라 실기기에서만 보인다 → FixedBg (position fixed 레이어 + clip)
+- **모바일 고정 배경** — `background-attachment: fixed` 를 모바일이 무시해 Milestones 배경이 크게 확대됐다. PC 를 좁혀 보면 정상이라 실기기에서만 보인다 → FixedBg. 1차 "fixed 레이어 + clip" 은 iOS 에서 늦게 그려져 실패, PC=background-attachment fixed / 터치=sticky 로 해결
 
 - **화면 캡처가 멈춘다**: Chrome 창이 Claude 앱 창에 완전히 가려지면 Windows 창 가림 감지로
   `document.visibilityState=hidden`, rAF 정지 → 스크린샷 30초 타임아웃. JS 실행은 된다(진단에 사용).
