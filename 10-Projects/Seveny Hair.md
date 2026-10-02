@@ -11,6 +11,9 @@ updated: 2026-10-02
 
 헤어샵 **seveny hair** 웹사이트. 네이버 플레이스: https://m.place.naver.com/hairshop/1767344271/home
 
+> 저장소는 **고객 계정 `sevenyhair/sevenyhair`** (2026-10-02 이관). 이전 `2xteam/seveny-hair` 는 보관용, 로컬 원격 이름 `2xteam`.
+> 인프라는 고객 계정으로 새로 만든다 — 순서는 저장소 `docs/setup-infra.md`.
+
 > MyJane 패밀리와 **별개 서비스**다. 스택은 [[Ignite]] 를 따른다.
 
 ## 스택
@@ -30,7 +33,10 @@ Next.js 15 · React 19 · Tailwind 3(preflight 끔) · MongoDB(mongoose 9) · �
 - [x] 2026-10-02 모바일 고정 배경 확대 문제 → FixedBg (1차 fixed+clip 은 iOS 에서 실패, 2차 터치 기기 sticky 로 해결)
 - [ ] 이미지 R2 이전 → 타겟 CDN 허용 제거
 - [ ] 관리자 CMS (Ignite 패턴)
-- [ ] 고객 MongoDB 계정으로 `MONGODB_URI` 교체
+- [x] 2026-10-02 저장소 이관 → sevenyhair/sevenyhair, Vercel 프로젝트 고객 쪽에 새로 생성 중
+- [ ] 고객 MongoDB Atlas 생성 → `MONGODB_URI` 교체 → `npm run seed`
+- [ ] 고객 Cloudflare R2 버킷 `sevenyhair` · API 토큰 (이미지 업로드 기능 때 사용)
+- [ ] 도메인 연결 → `NEXT_PUBLIC_SITE_URL`
 
 ## DB — `seveny`
 
@@ -43,7 +49,7 @@ Next.js 15 · React 19 · Tailwind 3(preflight 끔) · MongoDB(mongoose 9) · �
 | `staff` | 디자이너 소개 |
 | `posts` | 블로그/공지 (`slug`, `publishedAt`) |
 
-인증은 지금 myjane 클러스터 것을 빌려 쓴다 → [[MongoDB Atlas]]. DB 이름은 코드 상수.
+지금까지는 myjane 클러스터 인증을 빌려 썼다(시드는 안 함). 고객 Atlas 로 새로 만든다 → [[MongoDB Atlas]]. DB 이름은 코드 상수 `seveny`.
 
 ## 클론 방법
 
