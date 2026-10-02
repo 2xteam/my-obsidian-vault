@@ -24,7 +24,6 @@ Next.js 15 · React 19 · Tailwind 3(preflight 끔) · MongoDB(mongoose 9) · �
 
 - [x] 2026-10-02 Webflow 사이트 "Laurence. das Haarlokal" 디자인·움직임 클론 (7개 라우트)
 - [x] DB 설계 · 시드 스크립트 (`npm run seed`)
-- [ ] 시드 실행 (공용 클러스터에 `seveny` DB 생성 — 확인 대기)
 - [x] 2026-10-02 영어화 + 네이버 플레이스 실데이터(사진 22·스타일 26·가격·영업시간·소개) 반영, 로고 제작
 - [x] 인스타 피드: 코드 저장 + 이미지 프록시 + `npm run ig` 수동 등록 (자동 수집은 하지 않기로 결정, 코드 제거)
 - [x] 2026-10-02 한글화 (메뉴·제목 영어 / 설명·가격·이력 한글, Pretendard · Noto Serif KR), 로고 SEV/ENY
@@ -34,7 +33,8 @@ Next.js 15 · React 19 · Tailwind 3(preflight 끔) · MongoDB(mongoose 9) · �
 - [ ] 이미지 R2 이전 → 타겟 CDN 허용 제거
 - [ ] 관리자 CMS (Ignite 패턴)
 - [x] 2026-10-02 저장소 이관 → sevenyhair/sevenyhair, Vercel 프로젝트 고객 쪽에 새로 생성 중
-- [ ] 고객 MongoDB Atlas 생성 → `MONGODB_URI` 교체 → `npm run seed`
+- [x] 2026-10-02 고객 MongoDB Atlas (`sevenyhair.8bgdaru.mongodb.net`) 생성 · 로컬 `MONGODB_URI` 교체 · `npm run seed` (35건)
+- [ ] 새 Vercel 프로젝트에 `MONGODB_URI` 등록 → Redeploy
 - [ ] 고객 Cloudflare R2 버킷 `sevenyhair` · API 토큰 (이미지 업로드 기능 때 사용)
 - [ ] 도메인 연결 → `NEXT_PUBLIC_SITE_URL`
 
